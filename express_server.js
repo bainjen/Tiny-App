@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+//tells express aoo to use ejs for templating engine
+app.set('view engine', 'ejs')
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -33,3 +36,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+
+
+//+++++++Where code goes to die. Or, maybe hybernate. Anyway, for my future reference...+++++++++
