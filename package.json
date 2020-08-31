@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/bainjen/Tiny-App/issues"
   },
-  "homepage": "https://github.com/bainjen/Tiny-App#readme"
+  "homepage": "https://github.com/bainjen/Tiny-App#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
