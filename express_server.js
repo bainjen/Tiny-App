@@ -1,8 +1,6 @@
 const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
-// const { url, method } = request; 
-// const render = require('render');
 //tells express aoo to use ejs for templating engine
 app.set('view engine', 'ejs')
 
@@ -26,16 +24,18 @@ app.get("/hello", (req, res) => {
 app.get("/set", (req, res) => {
   const a = 1;
   res.send(`a = ${a}`);
- });
- 
- app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
- });
+});
 
+app.get("/fetch", (req, res) => {
+  res.send(`a = ${a}`);
+});
+
+//sharing data with urls_index.ejs
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase }; 
-  res.render('urls_index', templateVars); 
- })
+  let templateVars = { urls: urlDatabase };
+  res.render('urls_index', templateVars);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -44,3 +44,17 @@ app.listen(PORT, () => {
 
 
 //+++++++Where code goes to die. Or, maybe hybernate. Anyway, for my future reference...+++++++++
+// const { url, method } = request; 
+// const render = require('render');
+
+
+//the templateVars object contains the string 'Hello World' under the key greeting. We then pass the templateVars object to the template called hello_world.
+
+// app.get("/hello", (req, res) => {
+//   let templateVars = { greeting: 'Hello World!' };
+//   res.render("hello_world", templateVars);
+// });
+
+//In our hello_world.ejs file, we can display the 'Hello World!' string stored in the templateVars object by calling the key greeting:
+// <!-- This would display the string "Hello World!" -->
+// <h1><%= greeting %></h1>
