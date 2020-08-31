@@ -5,6 +5,7 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs')
 
 const urlDatabase = {
+  // shortURL: longURL, 
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
@@ -15,25 +16,27 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-}); 
+});
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
 
 //sharing data with urls_index.ejs
 app.get('/urls', (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
+});
+
+
+app.get("/urls/:shortURL", (req, res) => {
+  //shortURL --> I am assigning a value from the request params, which I have called shortURL --> longURL -->I am accessing a value; 
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  // console.log("request object", req);
+  // console.log("response object", res);
+  console.log(req.params);
+  res.render("urls_show", templateVars);
 });
 
 
@@ -51,10 +54,22 @@ app.listen(PORT, () => {
 //the templateVars object contains the string 'Hello World' under the key greeting. We then pass the templateVars object to the template called hello_world.
 
 // app.get("/hello", (req, res) => {
-//   let templateVars = { greeting: 'Hello World!' };
-//   res.render("hello_world", templateVars);
+  //   let templateVars = { greeting: 'Hello World!' };
+  //   res.render("hello_world", templateVars);
+  // });
+
+  //In our hello_world.ejs file, we can display the 'Hello World!' string stored in the templateVars object by calling the key greeting:
+  // <!-- This would display the string "Hello World!" -->
+  // <h1><%= greeting %></h1>
+
+
+  //example of how they don't connect
+
+// app.get("/set", (req, res) => {
+//   const a = 1;
+//   res.send(`a = ${a}`);
 // });
 
-//In our hello_world.ejs file, we can display the 'Hello World!' string stored in the templateVars object by calling the key greeting:
-// <!-- This would display the string "Hello World!" -->
-// <h1><%= greeting %></h1>
+// app.get("/fetch", (req, res) => {
+//   res.send(`a = ${a}`);
+// });
