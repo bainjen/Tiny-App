@@ -1,7 +1,8 @@
-const express = require("express");
+const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
-
+// const { url, method } = request; 
+// const render = require('render');
 //tells express aoo to use ejs for templating engine
 app.set('view engine', 'ejs')
 
@@ -31,6 +32,10 @@ app.get("/set", (req, res) => {
   res.send(`a = ${a}`);
  });
 
+app.get('/urls', (req, res) => {
+  let templateVars = { urls: urlDatabase }; 
+  res.render('urls_index', templateVars); 
+ })
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
