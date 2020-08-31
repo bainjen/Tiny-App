@@ -1,0 +1,20 @@
+{
+  "name": "Tiny-App",
+  "version": "1.0.0",
+  "description": "an app that takes in and shortens urls",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bainjen/Tiny-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bainjen/Tiny-App/issues"
+  },
+  "homepage": "https://github.com/bainjen/Tiny-App#readme"
+}
