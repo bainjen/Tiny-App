@@ -1,11 +1,15 @@
 const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
-//tells express to use ejs for templating engine
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true })); //convert req body from buffer to string, then add the data to the req(request) object under the key body.
+
+//convert req body from buffer to string, add data to req(request) obj
+app.use(bodyParser.urlencoded({ extended: true })); 
 app.set('view engine', 'ejs');
 
+//++++++FUNCTIONS+++++++
+
+//create a random 6 character string for short url 
 const getRandomString = (numOfChars) => {
   let randomCharsStr = '';
   const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -15,12 +19,15 @@ const getRandomString = (numOfChars) => {
   return randomCharsStr;
 };
 
+//+++++DATA OBJECT+++++++++
 
 const urlDatabase = {
   // shortURL: longURL, 
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+//++++SERVER REQUESTS++++++
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -33,16 +40,16 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-//GET route to render the urls_new.ejs template (given below) in the browser, to present the form to the user; and a POST route to handle the form submission.
-
+//GET route to render the urls_new.ejs template (user form)
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//handles user input form submission
+//post request has a body, a get request does not. 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+  console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6); 
-  //we saw long url consoled when enterd req.body so this is how we access that value and set it to the short URL string
   urlDatabase[tempShortUrl] = req.body.longURL; 
   let templateVars = { shortURL: tempShortUrl, longURL: req.body.longURL};
   res.render('urls_show', templateVars)
@@ -54,18 +61,14 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(longURL);
   console.log('after redirect');
 });
-//post request has a body, a get request does not. this is how we submit POST requests. request body is sent as a buffer. - install body-parser as middleman to make it readable.  
-
-//The GET /urls/new route needs to be defined before the GET /urls/:id route. Routes defined earlier will take precedence, so if we place this route after the /urls/:id definition, any calls to /urls/new will be handled by app.get("/urls/:id", ...) because Express will think that new is a route parameter. Routes should be ordered from most specific to least specific.
 
 app.get("/urls/:shortURL", (req, res) => {
-  //shortURL --> I am assigning a value from the request params, which I have called shortURL --> longURL -->I am accessing a value; 
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  
+  //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }; 
+  res.render("urls_show", templateVars);
   // console.log("request object", req);
   // console.log("response object", res);
-  console.log(req.params);
-  res.render("urls_show", templateVars);
+  // console.log(req.params);
 });
 
 
