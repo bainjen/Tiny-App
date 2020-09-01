@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
-//tells express aoo to use ejs for templating engine
+//tells express to use ejs for templating engine
 app.set('view engine', 'ejs')
 
 const urlDatabase = {
