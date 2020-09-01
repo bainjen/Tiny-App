@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080; // default port 8080
 //tells express to use ejs for templating engine
 const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({ extended: true })); //convert req body from buffer to string, then add the data to the req(request) object under the key body.
+app.set('view engine', 'ejs');
 
 const getRandomString = (numOfChars) => {
   let randomCharsStr = '';
@@ -13,8 +15,6 @@ const getRandomString = (numOfChars) => {
   return randomCharsStr;
 };
 
-app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true })); //convert req body from buffer to string, then add the data to the req(request) object under the key body.
 
 const urlDatabase = {
   // shortURL: longURL, 
@@ -44,13 +44,16 @@ app.post("/urls", (req, res) => {
   let tempShortUrl = getRandomString(6); 
   //we saw long url consoled when enterd req.body so this is how we access that value and set it to the short URL string
   urlDatabase[tempShortUrl] = req.body.longURL; 
-  res.redirect(`urls/${tempShortUrl}`)
+  let templateVars = { shortURL: tempShortUrl, longURL: req.body.longURL};
+  res.render('urls_show', templateVars)
 });
 
-app.get('u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL]; 
-  res.redirect(longURL); 
-})
+app.get('/u/:shortURL', (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  console.log('before redirect', longURL)
+  res.redirect(longURL);
+  console.log('after redirect');
+});
 //post request has a body, a get request does not. this is how we submit POST requests. request body is sent as a buffer. - install body-parser as middleman to make it readable.  
 
 //The GET /urls/new route needs to be defined before the GET /urls/:id route. Routes defined earlier will take precedence, so if we place this route after the /urls/:id definition, any calls to /urls/new will be handled by app.get("/urls/:id", ...) because Express will think that new is a route parameter. Routes should be ordered from most specific to least specific.
@@ -67,6 +70,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 
 
+//++++++++++DAY ONE SUMMARY OF FUNCTIONALITY+++++++++++++++++
 
 
 //+++++++Where code goes to die. Or, maybe hybernate. Anyway, for my future reference...+++++++++
