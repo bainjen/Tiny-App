@@ -1,3 +1,5 @@
+//+++++++SETUP++++++++++++
+
 const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -27,7 +29,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//++++SERVER REQUESTS++++++
+//++++SERVER REQUESTS && RESPONSES++++++
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -71,6 +73,12 @@ app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params);
 });
 
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  //req.params allows access to variables in url
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls")
+})
 
 
 //++++++++++DAY ONE SUMMARY OF FUNCTIONALITY+++++++++++++++++
