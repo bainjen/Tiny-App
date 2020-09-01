@@ -2,7 +2,19 @@ const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
 //tells express to use ejs for templating engine
-app.set('view engine', 'ejs')
+const bodyParser = require("body-parser");
+
+const getRandomString = (numOfChars) => {
+  let randomCharsStr = '';
+  const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < numOfChars; i++) {
+    randomCharsStr += possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
+  }
+  return randomCharsStr; 
+}; 
+
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true})); //convert req body from buffer to string, then add the data to the req(request) object under the key body.
 
 const urlDatabase = {
   // shortURL: longURL, 
@@ -18,9 +30,6 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-// app.get("/urls.json", (req, res) => {
-//   res.json(urlDatabase);
-// });
 
 //sharing data with urls_index.ejs
 app.get('/urls', (req, res) => {
@@ -34,7 +43,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-//post request has a body, a get request does not.
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // Log the POST request body to the console
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+});
+
+//post request has a body, a get request does not. this is how we submit POST requests. request body is sent as a buffer. - install body-parser as middleman to make it readable.  
 app.post("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -44,7 +58,7 @@ app.post("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from the request params, which I have called shortURL --> longURL -->I am accessing a value; 
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-
+  
   // console.log("request object", req);
   // console.log("response object", res);
   console.log(req.params);
@@ -59,6 +73,9 @@ app.get("/urls/:shortURL", (req, res) => {
 // const { url, method } = request; 
 // const render = require('render');
 
+// app.get("/urls.json", (req, res) => {
+//   res.json(urlDatabase);
+// });
 
 //the templateVars object contains the string 'Hello World' under the key greeting. We then pass the templateVars object to the template called hello_world.
 
