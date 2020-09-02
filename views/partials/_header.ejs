@@ -4,7 +4,8 @@
     <a class="navbar-brand" href="/urls">TinyApp</a>
 
     <% if (username) { %>
-      <p><%= username %></p>
+      <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= username %></h5>
+
       <form class="" action="/logout" method="POST">
         <button type="submit" class="btn btn-info">logout</button>
       </form>
@@ -13,9 +14,9 @@
     <!-- login form -->
     <% } else { %>
 
-    <form class="" action="/login" method="POST">
+    <form action="/login" method="POST">
       <input type='text' name='username' placeholder="username">
-      <button type="submit" class="btn btn-info">submit</button>
+      <button type="submit" class="btn btn-outline-dark my-2 my-sm-0">login</button>
     </form>
     <% } %>
     
@@ -31,6 +32,9 @@
     </div>
   </nav>
 </header>
+
+<!-- class="form-control mr-sm-2" -->
+
 
 
 
