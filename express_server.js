@@ -54,7 +54,8 @@ app.post("/urls", (req, res) => {
   let tempShortUrl = getRandomString(6); 
   urlDatabase[tempShortUrl] = req.body.longURL; 
   let templateVars = { shortURL: tempShortUrl, longURL: req.body.longURL};
-  res.render('urls_show', templateVars)
+  // res.render('urls_show', templateVars)
+  res.redirect(`/urls/${tempShortUrl}`);
 });
 
 app.get('/u/:shortURL', (req, res) => {
@@ -78,7 +79,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   //req.params allows access to variables in url
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls")
-})
+});
+
+
+app.post("/urls/:shortURL", (req, res) => {
+ urlDatabase[req.params.shortURL] = req.body.longURL;
+ res.redirect("/urls")
+});
+
 
 
 //++++++++++DAY ONE SUMMARY OF FUNCTIONALITY+++++++++++++++++
