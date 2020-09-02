@@ -23,13 +23,14 @@ const getRandomString = (numOfChars) => {
   return randomCharsStr;
 };
 
-//+++++DATA OBJECT+++++++++
+//+++++DATA OBJECT +++++++++
 
 const urlDatabase = {
   // shortURL: longURL, 
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
 
 //++++SERVER REQUESTS && RESPONSES++++++
 
@@ -40,14 +41,22 @@ app.listen(PORT, () => {
 
 //sharing data with urls_index.ejs
 app.get('/urls', (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars =
+  {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
   res.render('urls_index', templateVars);
 });
-//new branch experiment 
 
 //GET route to render the urls_new.ejs template (user form)
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars =
+  {
+    urls: urlDatabase,
+    username: req.cookies['username']
+  };
+  res.render("urls_new", templateVars);
 });
 
 //handles user input form submission
@@ -56,21 +65,29 @@ app.post("/urls", (req, res) => {
   console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6); 
   urlDatabase[tempShortUrl] = req.body.longURL; 
-  let templateVars = { shortURL: tempShortUrl, longURL: req.body.longURL};
+  let templateVars = {
+    shortURL: tempShortUrl,
+    longURL: req.body.longURL
+  };
   // res.render('urls_show', templateVars)
   res.redirect(`/urls/${tempShortUrl}`);
 });
 
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  console.log('before redirect', longURL)
+  // console.log('before redirect', longURL)
   res.redirect(longURL);
-  console.log('after redirect');
+  // console.log('after redirect');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] }; 
+  let templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL],
+    urls: urlDatabase,
+    username: req.cookies['username']
+  }; 
   res.render("urls_show", templateVars);
   // console.log("request object", req);
   // console.log("response object", res);
@@ -92,6 +109,11 @@ app.post("/urls/:shortURL", (req, res) => {
 
 app.post("/login", (req, res) => {
   res.cookie('username', req.body.username);
+  res.redirect("/urls");
+});
+ 
+app.post("/logout", (req, res) => {
+  res.clearCookie('username', req.body.username);
   res.redirect("/urls");
  });
 

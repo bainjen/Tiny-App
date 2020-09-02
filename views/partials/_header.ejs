@@ -3,12 +3,21 @@
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
 
+    <% if (username) { %>
+      <p><%= username %></p>
+      <form class="" action="/logout" method="POST">
+        <button type="submit" class="btn btn-info">logout</button>
+      </form>
+  
+   
     <!-- login form -->
+    <% } else { %>
+
     <form class="" action="/login" method="POST">
       <input type='text' name='username' placeholder="username">
       <button type="submit" class="btn btn-info">submit</button>
     </form>
-  <!-- MENTOR QUESTION What is my form action being set to? -->
+    <% } %>
     
     <!-- right side hamburger toggle and links -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
