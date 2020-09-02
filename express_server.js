@@ -163,23 +163,27 @@ app.post('/register', (req, res) => {
 
   
   //if empty strings --> response = 404 statuscode
-  if (userEmail === '' || userPW === '') {
-    console.log('404 code will go here')
-  } else if (emailExists(userEmail)) {
-    console.log('already exists!')
-  }
-  //if email already exist --> response = 404 statuscode
-  //create an email lookup helper function DRY code
-  // console.log(users[user_id]);
-    
-  users[user_id] = {
-    id: user_id,
-    email: userEmail,
-    password: userPW,
-  };
-
-  res.cookie('user_id', user_id);
-  res.redirect("/urls");
+  if (!userEmail || !userPW || emailExists(userEmail)) {
+    res.status(400).send('Sorry, your email or password is invalid.')
+    console.log(users); 
+    // res.status = 400;
+    // console.log(res.statusCode)
+    // res.status(400).send('Sorry, your email or password is invalid.')
+    // console.log('404 code will go here')
+    // console.log('already exists!')
+    //if email already exist --> response = 404 statuscode
+    //create an email lookup helper function DRY code
+    // console.log(users[user_id]);
+  } else {
+    users[user_id] = {
+      id: user_id,
+      email: userEmail,
+      password: userPW,
+    };
+  
+    res.cookie('user_id', user_id);
+    res.redirect("/urls");
+  }   
 }); 
 
 
