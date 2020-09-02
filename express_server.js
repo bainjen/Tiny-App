@@ -24,6 +24,15 @@ const getRandomString = (numOfChars) => {
   return randomCharsStr;
 };
 
+//create a function to look up if email already exist (return boolean?)
+const emailExists = (emailAddress) => {
+  for (const user in users) {
+    if (emailAddress === users[user].email) {
+     return true; 
+   }
+ }
+}
+
 //+++++DATA OBJECTS +++++++++
 
 const urlDatabase = {
@@ -146,18 +155,29 @@ app.post("/logout", (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+
   const user_id = getRandomString(5); 
+  const userEmail = req.body.email;
+  const userPW = req.body.password;
+
+
+  
+  //if empty strings --> response = 404 statuscode
+  if (userEmail === '' || userPW === '') {
+    console.log('404 code will go here')
+  } else if (emailExists(userEmail)) {
+    console.log('already exists!')
+  }
+  //if email already exist --> response = 404 statuscode
+  //create an email lookup helper function DRY code
+  // console.log(users[user_id]);
+    
   users[user_id] = {
     id: user_id,
-    email: req.body.email,
-    password: req.body.password,
+    email: userEmail,
+    password: userPW,
   };
-  // console.log(userID);
-  // console.log(req.body.email);
-  // console.log(req.body.password);
-  // console.log(newUser);
-  // console.log('user database', users);
-  console.log(users[user_id]);
+
   res.cookie('user_id', user_id);
   res.redirect("/urls");
 }); 
