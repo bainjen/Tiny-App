@@ -59,8 +59,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-//handles user input form submission
-//post request has a body, a get request does not. 
+//handles user input form submission //post request has body, get request does not. 
 app.post("/urls", (req, res) => {
   console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6); 
@@ -116,6 +115,17 @@ app.post("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/urls");
  });
+
+ app.get("/register", (req, res) => {
+   let templateVars = {
+    urls: urlDatabase,
+    username: req.cookies['username'],
+    email: req.params.email,
+    password: req.params.password
+  }; 
+  res.render("urls_register", templateVars);
+});
+
 
 
 //++++++++++DAY ONE SUMMARY OF FUNCTIONALITY+++++++++++++++++
