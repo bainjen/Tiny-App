@@ -54,20 +54,26 @@ app.listen(PORT, () => {
 
 
 app.get('/urls', (req, res) => {
+  const user_id = req.cookies['user_id'];
+  // console.log(user_id);
+  // console.log(users);
+  // console.log(users[user_id].email);
   let templateVars =
   {
     urls: urlDatabase,
-    username: req.cookies['user_id']
+    username: user_id,
+    email: users[user_id].email
   };
   res.render('urls_index', templateVars);
 });
 
 //GET route to render the urls_new.ejs template (user form)
 app.get("/urls/new", (req, res) => {
+  const user_id = req.cookies['user_id'];
   let templateVars =
   {
     urls: urlDatabase,
-    username: req.cookies['user_id']
+    username: user_id
   };
   res.render("urls_new", templateVars);
 });
@@ -77,28 +83,27 @@ app.post("/urls", (req, res) => {
   // console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6); 
   urlDatabase[tempShortUrl] = req.body.longURL; 
-  let templateVars = {
-    shortURL: tempShortUrl,
-    longURL: req.body.longURL
-  };
-  // res.render('urls_show', templateVars)
+  // let templateVars = {
+  //   username: req.cookies['user_id'],
+  //   shortURL: tempShortUrl,
+  //   longURL: req.body.longURL
+  // };
   res.redirect(`/urls/${tempShortUrl}`);
 });
 
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  // console.log('before redirect', longURL)
   res.redirect(longURL);
-  // console.log('after redirect');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
+  const user_id = req.cookies['user_id'];
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     urls: urlDatabase,
-    username: req.cookies['user_id']
+    username: user_id
   }; 
   res.render("urls_show", templateVars);
   // console.log("request object", req);
@@ -132,7 +137,7 @@ app.post("/logout", (req, res) => {
  app.get("/register", (req, res) => {
    let templateVars = {
     urls: urlDatabase,
-    username: req.cookies['user_id'],
+    user_id: req.cookies['user_id'],
     email: req.params.email,
     password: req.params.password
    }; 
@@ -151,7 +156,8 @@ app.post('/register', (req, res) => {
   // console.log(req.body.email);
   // console.log(req.body.password);
   // console.log(newUser);
-  console.log('user database', users);
+  // console.log('user database', users);
+  console.log(users[user_id]);
   res.cookie('user_id', user_id);
   res.redirect("/urls");
 }); 
