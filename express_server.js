@@ -4,10 +4,12 @@ const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 
 //convert req body from buffer to string, add data to req(request) obj
 app.use(bodyParser.urlencoded({ extended: true })); 
 app.set('view engine', 'ejs');
+app.use(cookieParser());
 
 //++++++FUNCTIONS+++++++
 
@@ -88,6 +90,10 @@ app.post("/urls/:shortURL", (req, res) => {
  res.redirect("/urls")
 });
 
+app.post("/login", (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect("/urls");
+ });
 
 
 //++++++++++DAY ONE SUMMARY OF FUNCTIONALITY+++++++++++++++++
