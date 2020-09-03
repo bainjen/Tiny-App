@@ -151,7 +151,6 @@ app.post("/login", (req, res) => {
   const userPW = req.body.password;
   const user_id = users['user_id'];
   res.cookie('user_id', user_id);
-  //I don't know if this is right
   //if statements 
   res.redirect("/urls");
 });
@@ -169,8 +168,7 @@ app.get("/register", (req, res) => {
     user_id: req.cookies['user_id'],
     email: req.params.email,
     password: req.params.password
-  };
-  //not certain I have the right template vars yet. 
+  }; 
   res.render("urls_register", templateVars);
 });
 
