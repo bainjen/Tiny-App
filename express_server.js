@@ -109,12 +109,23 @@ app.get('/urls', (req, res) => {
 //create a new shortened url 
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
-  let templateVars =
-  {
+  // let templateVars =
+  // {
+  //   urls: urlDatabase,
+  //   // username: user_id
+  //   user_id: users.email
+  // };
+  
+  const user = getUserById(user_id); 
+  if (getUserById(user_id) === null) {
+    return res.redirect('/login');
+  }
+
+  let templateVars = {
     urls: urlDatabase,
-    // username: user_id
-    user_id: users.email
+    user: user
   };
+
   res.render("urls_new", templateVars);
 });
 
@@ -190,7 +201,7 @@ app.post("/login", (req, res) => {
   if (user.password !== userPW) {
     return res.send('Username or password incorrect: please try again'); 
   }
-   const user_id = users['user_id'];
+   const user_id = users.user_id;
   res.cookie('user_id', user.id);
   res.redirect("/urls");
 });
