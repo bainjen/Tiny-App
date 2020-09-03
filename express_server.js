@@ -33,6 +33,24 @@ const emailExists = (emailAddress) => {
   }
 }
 
+const getUserById = (id) => {
+  const user = users[id];
+  if (user) {
+    return user;
+  }
+  return null;
+};
+
+const getUserByEmail = (email) => {
+  for (const userID in users) {
+    const user = users[userID];
+    if (email === user.email) {
+      return user; 
+    }
+  }
+  return null; 
+}
+
 //+++++DATA OBJECTS +++++++++
 
 const urlDatabase = {
@@ -68,15 +86,22 @@ app.get('/', (req, resp) => {
 
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = req.cookies['user_id'];
-  console.log('line 72 ', user_id);
+  const user_id = req.cookies.user_id;
+  //need to add error message - checking to see whether user has been assigned a cookie
+  if (!user_id) {
+    return res.redirect('/login');
+  }
+  // console.log('line 72 ', user_id);
   // console.log(users);
   // console.log(users[user_id].email);
+  const user = getUserById(user_id); 
+  if (!user) {
+    return res.redirect('/login');
+  }
+
   let templateVars = {
     urls: urlDatabase,
-    user_id: users.email,
-    // user_id: user_id xs
-    // email: [user_id].email
+    user: user
   };
   res.render('urls_index', templateVars);
 });
@@ -109,12 +134,13 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
-  const user_id = req.cookies['user_id'];
+  const user = req.cookies['user_id'];
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
     urls: urlDatabase,
-    user_id: users.email,
+    user: user
+    // user_id: users.email,
     // username: user_id
   };
   res.render("urls_show", templateVars);
@@ -139,8 +165,9 @@ app.post("/urls/:shortURL", (req, res) => {
 //login page for registered user
 app.get("/login", (req, res) => {
   let templateVars = {
-    user_id: req.cookies['user_id'],
-    email: req.params.email,
+    user: null
+    // user_id: req.cookies['user_id'],
+    // email: req.params.email,
   };
   res.render("urls_login", templateVars);
 });
@@ -149,9 +176,22 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPW = req.body.password;
-  const user_id = users['user_id'];
-  res.cookie('user_id', user_id);
+  // const user_id = users['user_id'];
+  // res.cookie('user_id', user_id);
   //if statements 
+  if (!userEmail || !userPW) {
+    return res.send('must fill out valid email and password'); 
+  }
+  const user = getUserByEmail(userEmail) 
+  if (user === null) {
+    return res.send('No user found with that email.');
+  }
+
+  if (user.userPW !== userPW) {
+    return res.send('Username or password incorrect: please try again'); 
+  }
+   const user_id = users['user_id'];
+  res.cookie('user_id', user.id);
   res.redirect("/urls");
 });
 
@@ -164,10 +204,10 @@ app.post("/logout", (req, res) => {
 //goes to page to register as a user
 app.get("/register", (req, res) => {
   let templateVars = {
-    urls: urlDatabase,
-    user_id: req.cookies['user_id'],
+    // urls: urlDatabase,
+    user: req.cookies['user_id'],
     email: req.params.email,
-    password: req.params.password
+    // password: req.params.password
   }; 
   res.render("urls_register", templateVars);
 });
@@ -189,9 +229,10 @@ app.post('/register', (req, res) => {
       email: userEmail,
       password: userPW,
     };
+    console.log(users);
     //move inside else stat
     res.cookie('user_id', user_id);
-    res.redirect("/urls");
+    res.redirect("/login");
   }
 });
 
