@@ -55,13 +55,18 @@ const users = {
 };
 
 
-//++++SERVER REQUESTS && RESPONSES++++++
+//++++ROUTES++++++
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//homepage
+app.get('/', (req, resp) => {
+//nothing here yet
+});
 
+//list of logged in user's urls
 app.get('/urls', (req, res) => {
   const user_id = req.cookies['user_id'];
   // console.log(user_id);
@@ -71,12 +76,12 @@ app.get('/urls', (req, res) => {
   {
     urls: urlDatabase,
     username: user_id,
-    email: users[user_id].email
+    email: [user_id].email
   };
   res.render('urls_index', templateVars);
 });
 
-//GET route to render the urls_new.ejs template (user form)
+//create a new shortened url 
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies['user_id'];
   let templateVars =
@@ -100,6 +105,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${tempShortUrl}`);
 });
 
+//link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
@@ -120,7 +126,7 @@ app.get("/urls/:shortURL", (req, res) => {
   // console.log(req.params);
 });
 
-
+//delete a link off url list
 app.post("/urls/:shortURL/delete", (req, res) => {
   //req.params allows access to variables in url
   delete urlDatabase[req.params.shortURL];
@@ -133,16 +139,30 @@ app.post("/urls/:shortURL", (req, res) => {
  res.redirect("/urls")
 });
 
+//login page for registered user
+app.get("/login", (req, res) => {
+  let templateVars = {
+   user_id: req.cookies['user_id'],
+   email: req.params.email,
+  }; 
+ res.render("urls_login", templateVars);
+});
+
+//redirect to user's existing list of urls
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.user_id);
+  const user_id = users[user_id];
+  res.cookie('user_id', user_id);
+  //I don't know if this is right
   res.redirect("/urls");
 });
+
  
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect("/urls");
  });
 
+ //goes to page to register as a user
  app.get("/register", (req, res) => {
    let templateVars = {
     urls: urlDatabase,
@@ -154,26 +174,17 @@ app.post("/logout", (req, res) => {
   res.render("urls_register", templateVars);
 });
 
+//validates registration, sends user to urls 
 app.post('/register', (req, res) => {
 
   const user_id = getRandomString(5); 
   const userEmail = req.body.email;
   const userPW = req.body.password;
-
-
-  
   //if empty strings --> response = 404 statuscode
   if (!userEmail || !userPW || emailExists(userEmail)) {
     res.status(400).send('Sorry, your email or password is invalid.')
     console.log(users); 
-    // res.status = 400;
-    // console.log(res.statusCode)
-    // res.status(400).send('Sorry, your email or password is invalid.')
-    // console.log('404 code will go here')
-    // console.log('already exists!')
-    //if email already exist --> response = 404 statuscode
-    //create an email lookup helper function DRY code
-    // console.log(users[user_id]);
+
   } else {
     users[user_id] = {
       id: user_id,
@@ -241,3 +252,14 @@ app.post('/register', (req, res) => {
 //   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 //   res.redirect
 // });
+
+//WED, 9/2
+// from post / register
+    // res.status = 400;
+    // console.log(res.statusCode)
+    // res.status(400).send('Sorry, your email or password is invalid.')
+    // console.log('404 code will go here')
+    // console.log('already exists!')
+    //if email already exist --> response = 404 statuscode
+    //create an email lookup helper function DRY code
+    // console.log(users[user_id]);
