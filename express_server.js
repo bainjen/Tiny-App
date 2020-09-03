@@ -108,7 +108,7 @@ app.get('/urls', (req, res) => {
 
 //create a new shortened url 
 app.get("/urls/new", (req, res) => {
-  const user_id = req.cookies['user_id'];
+  const user_id = req.cookies.user_id;
   let templateVars =
   {
     urls: urlDatabase,
@@ -134,7 +134,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
-  const user = req.cookies['user_id'];
+  const user = req.cookies.user_id;
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
@@ -187,7 +187,7 @@ app.post("/login", (req, res) => {
     return res.send('No user found with that email.');
   }
 
-  if (user.userPW !== userPW) {
+  if (user.password !== userPW) {
     return res.send('Username or password incorrect: please try again'); 
   }
    const user_id = users['user_id'];
@@ -205,7 +205,7 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = {
     // urls: urlDatabase,
-    user: req.cookies['user_id'],
+    user: req.cookies.user_id,
     email: req.params.email,
     // password: req.params.password
   }; 
@@ -232,7 +232,7 @@ app.post('/register', (req, res) => {
     console.log(users);
     //move inside else stat
     res.cookie('user_id', user_id);
-    res.redirect("/login");
+    res.redirect("/urls");
   }
 });
 
