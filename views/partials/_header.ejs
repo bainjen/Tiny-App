@@ -2,22 +2,28 @@
   <!-- top-left clickable TinyApp -->
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/urls">My URLs</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+      </div>
+    </div>
 
     <% if (!user) { %>
 
-      <a href="/login">Login Here!</a>
-      <a href="/register">Register Here!</a>
-      
-      <!-- login form -->
-      <% } else { %>
-        
-        <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= user.email %></h5>
-    
-        <form class="" action="/logout" method="POST">
-          <button type="submit" class="btn btn-info">logout</button>
-        </form>
-        <a href="/logout"></a>
-        <!-- <form action="/login" method="POST">
+    <a href="/login">Login Here!</a>
+    <a href="/register">Register Here!</a>
+
+    <!-- login form -->
+    <% } else { %>
+
+    <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= user.email %></h5>
+
+    <form class="" action="/logout" method="POST">
+      <button type="submit" class="btn btn-info">logout</button>
+    </form>
+    <a href="/logout"></a>
+    <!-- <form action="/login" method="POST">
       <input type='text' name='username' placeholder="username">
       <button type="submit" class="btn btn-outline-dark my-2 my-sm-0">login</button>
     </form> -->
@@ -28,12 +34,7 @@
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-      </div>
-    </div>
+
   </nav>
 </header>
 
