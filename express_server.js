@@ -78,7 +78,8 @@ const users = {
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    // password: "dishwasher-funk"
+    password: '$2b$10$8k5NzueKCVAelU5dCC/syeLeXLOywhiQjVW8DHuQJGRJz6LWQZ55S'
   }
 };
 
@@ -124,9 +125,7 @@ app.get('/urls', (req, res) => {
   //  const user = getUserById(user_id);
   // let templateVars = { urls: urlsForUserDB, user:  }
   // }
-  console.log(urlDatabase);
   const urlsForUserDB = urlsForUser(user_id)
-  console.log('urlsForUserDB: line 124', urlsForUserDB)
 
   let templateVars = {
     urls: urlsForUserDB,
@@ -253,7 +252,8 @@ app.post("/login", (req, res) => {
     return res.send('No user found with that email.');
   }
 
-  if (user.password !== userPW) {
+  // if (user.password !== userPW) {
+  if (!bcrypt.compareSync(userPW, user.password)) {             //andre
     return res.send('Username or password incorrect: please try again');
   } else {                  //andre added "else" from line 258 - 264
 
@@ -290,7 +290,6 @@ app.post('/register', (req, res) => {
   //if empty strings --> response = 404 statuscode
   if (!userEmail || !userPW || emailExists(userEmail)) {
     res.status(400).send('Sorry, your email or password is invalid.')
-    console.log(users);
 
   } else {
     const hashedPassword = bcrypt.hashSync(userPW, 10)     //andre
@@ -301,6 +300,7 @@ app.post('/register', (req, res) => {
       // password: userPW,      //jen to be removed this line
     };
 
+    console.log('users: line 305', users)
     //move inside else stat
     res.cookie('user_id', user_id);
     res.redirect("/urls");
