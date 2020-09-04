@@ -1,9 +1,7 @@
-// Make Sure your codes names match up with your functions and 
-// remember to import 
 
 const { assert } = require('chai');
 
-const { getUserByEmail, generateRandomString, urlsForUser } = require('../helpers.js');
+const { getUserByEmail, urlsForUser, getRandomString } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -37,22 +35,22 @@ describe('getUserByEmail', function() {
     assert.strictEqual(actual, actual);
   });  
 
-  it('should return undefined with a non-existent email', function() {
+  it('should return null with a non-existent email', function() {
     const actual = getUserByEmail("invalid@example.com", testUsers);
-    const expectedOutput = undefined;
+    const expectedOutput = null;
     assert.strictEqual(actual, expectedOutput);
   });  
 });
 
 describe('generateRandomString', function() {
   it('should return a string', function() {
-    const actual = typeof generateRandomString();
+    const actual = typeof getRandomString();
     const expected = "string";
     assert.strictEqual(actual, expected);
   });
 
   it('should return false between two random strings', function() {
-    const actual = generateRandomString() === generateRandomString();
+    const actual = getRandomString(5) === getRandomString(5);
     const expected = false;
     assert.strictEqual(actual, expected);
   });
