@@ -6,8 +6,8 @@ const PORT = 8080; // default port 8080
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const { getUserByEmail, getUserById, urlsForUser, emailExists, getRandomString } = require('./helpers');
 
-//+++++++++MIDDLEWARE+++++++++
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
@@ -65,15 +65,15 @@ app.get('/', (req, res) => {
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
-  const urlsForUserDB = urlsForUser(user_id);
-  console.log(urlDatabase);
-  console.log('urlsForUserDB: inside urls', urlsForUserDB);
+  const urlsForUserDB = urlsForUser(user_id, urlDatabase);
+  // console.log(urlDatabase);
+  // console.log('urlsForUserDB: inside urls', urlsForUserDB);
   //need to add error message - checking to see whether user has been assigned a cookie
   if (!user_id) {
     return res.redirect('/login');
   }
 
-  const user = getUserById(user_id); //return an object
+  const user = getUserById(user_id, users); //return an object
 
   if (!user) {
     return res.redirect('/login');
@@ -89,7 +89,7 @@ app.get('/urls', (req, res) => {
 //create a new shortened url
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
-  const user = getUserById(user_id);
+  const user = getUserById(user_id, users);
 
   if (user === null) {
     return res.redirect('/login');
@@ -205,7 +205,7 @@ app.post('/register', (req, res) => {
   const userEmail = req.body.email;
   const userPW = req.body.password;
   //if empty strings --> response = 404 statuscode
-  if (!userEmail || !userPW || emailExists(userEmail)) {
+  if (!userEmail || !userPW || emailExists(userEmail, users)) {
     res.status(400).send('Sorry, your email or password is invalid.');
   } else {
     req.session.user_id = user_id;

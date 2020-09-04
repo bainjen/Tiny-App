@@ -1,7 +1,7 @@
 
 //++++++FUNCTIONS+++++++
 
-const urlsForUser = (id) => {
+const urlsForUser = (id, urlDatabase) => {
   let userURLdata = {};
   for (const url in urlDatabase) {
     if (id === urlDatabase[url].userID) {
@@ -22,7 +22,7 @@ const getRandomString = (numOfChars) => {
 };
 
 //create a function to look up if email already exist
-const emailExists = (emailAddress) => {
+const emailExists = (emailAddress, users) => { // james justs added users
   for (const user in users) {
     if (emailAddress === users[user].email) {
       return true;
@@ -30,7 +30,7 @@ const emailExists = (emailAddress) => {
   }
 };
 
-const getUserById = (id) => {
+const getUserById = (id, users) => {
   const user = users[id];
   if (user) {
     return user;
@@ -47,3 +47,5 @@ const getUserByEmail = (email, users) => {
   }
   return null;
 };
+
+module.exports = { getUserByEmail, getUserById, urlsForUser, emailExists, getRandomString }; 
