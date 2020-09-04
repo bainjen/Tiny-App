@@ -88,7 +88,7 @@ const urlsForUser = (id) => {
       userURLdata[url] = urlDatabase[url];
    }
   }
-  console.log(userURLdata);
+  // console.log(userURLdata);
   return userURLdata; 
 }
 
@@ -118,11 +118,12 @@ app.get('/urls', (req, res) => {
   if (!user) {
     return res.redirect('/login');
   }
-  
+  const something = urlsForUser(user_id); 
   let templateVars = {
-    urls: urlsForUser(user_id),
+    urls: something,
     user: user
   };
+  console.log(urlsForUser(user_id));
   res.render('urls_index', templateVars);
 });
 
@@ -130,8 +131,8 @@ app.get('/urls', (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
   const user = getUserById(user_id);
-  console.log('user', user);
-  console.log('user_id', user_id);
+  // console.log('user', user);
+  // console.log('user_id', user_id);
   // let templateVars =
   // {
   //   urls: urlDatabase,
@@ -151,9 +152,9 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.post("/urls/new", (req, res) => {
-  res.redirect("/urls");
-});
+// app.post("/urls/new", (req, res) => {
+//   res.redirect("/urls");
+// });
 
 
 //handles user input form submission
@@ -161,13 +162,14 @@ app.post("/urls", (req, res) => {
   // console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6);
   const user_id = req.cookies.user_id;
-  
+  // console.log(user_id); 
   urlDatabase[tempShortUrl] = {
     longURL: req.body.longURL,
     user_id: user_id
   }
-  console.log("is it me?", urlDatabase[tempShortUrl])
-  res.redirect(`/urls/${tempShortUrl}`);
+  console.log("is it me?", urlDatabase)
+  // res.redirect(`/urls/${tempShortUrl}`);
+  res.redirect('/urls');
 });
 
 //link that redirects to long url page
@@ -198,20 +200,15 @@ app.get("/urls/:shortURL", (req, res) => {
   }
   return res.send('Error, URL does not exist');
   
-  //   longURL: urlDatabase[req.params.shortURL],
-  //   urls: urlDatabase,
-  //   user: user
-  //   // user_id: users.email,
-  //   // username: user_id
-  // };
-  // console.log("request object", req);
-  // console.log("response object", res);
-  // console.log(req.params);
 });
 
 //delete a link off url list
 app.post("/urls/:shortURL/delete", (req, res) => {
   //req.params allows access to variables in url
+  const user = req.cookies.user_id;
+  if (!user) {
+    return res.redirect('/login');
+  };
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls")
 });
