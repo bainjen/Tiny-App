@@ -4,14 +4,19 @@ const express = require('express');
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
-const bcrypt = require('bcrypt')      //andre
+//const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt')         //andre
+const cookieSession = require('cookie-session')   //andre
 
 //+++++++++MIDDLEWARE+++++++++
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['suzy'],
+}))  //andre
 app.set('view engine', 'ejs');
-app.use(cookieParser());
+//app.use(cookieParser());
 
 //++++++FUNCTIONS+++++++
 
@@ -109,8 +114,7 @@ app.get('/', (req, res) => {
 
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = req.cookies.user_id;
-  console.log("WHAT DOES THIS RETURN US:", user_id);
+  const user_id = req.session.user_id
   //need to add error message - checking to see whether user has been assigned a cookie
   if (!user_id) {
     return res.redirect('/login');
@@ -138,7 +142,7 @@ app.get('/urls', (req, res) => {
 
 //create a new shortened url 
 app.get("/urls/new", (req, res) => {
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
   const user = getUserById(user_id);
   // console.log('user', user);
   // console.log('user_id', user_id);
@@ -170,7 +174,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   // console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6);
-  const user_id = req.cookies.user_id;
+  const user_id = req.session.user_id;
   urlDatabase[tempShortUrl] = {
     longURL: req.body.longURL,
     user_id: user_id
@@ -190,7 +194,7 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
-  const user = users[req.cookies.user_id];
+  const user = users[req.session.user_id];
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
   if (!user) {
@@ -213,7 +217,7 @@ app.get("/urls/:shortURL", (req, res) => {
 //delete a link off url list
 app.post("/urls/:shortURL/delete", (req, res) => {
   //req.params allows access to variables in url
-  const user = req.cookies.user_id;
+  const user = req.session.user_id;
   if (!user) {
     return res.redirect('/login');
   };
@@ -258,6 +262,7 @@ app.post("/login", (req, res) => {
   } else {                  //andre added "else" from line 258 - 264
 
     const user_id = users.user_id;
+    // req.session.user_id = user.id      //andre
     res.cookie('user_id', user.id);
     res.redirect("/urls");
 
@@ -266,7 +271,8 @@ app.post("/login", (req, res) => {
 
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
+  //res.clear('user_id');
   res.redirect("/urls");
 });
 
@@ -274,7 +280,7 @@ app.post("/logout", (req, res) => {
 app.get("/register", (req, res) => {
   let templateVars = {
     // urls: urlDatabase,
-    user: req.cookies.user_id,
+    user: req.session.user_id,
     // email: req.params.email, /// andre commented out
     // password: req.params.password
   };
@@ -292,6 +298,7 @@ app.post('/register', (req, res) => {
     res.status(400).send('Sorry, your email or password is invalid.')
 
   } else {
+    req.session.user_id = user_id;
     const hashedPassword = bcrypt.hashSync(userPW, 10)     //andre
     users[user_id] = {
       id: user_id,
@@ -300,9 +307,8 @@ app.post('/register', (req, res) => {
       // password: userPW,      //jen to be removed this line
     };
 
-    console.log('users: line 305', users)
     //move inside else stat
-    res.cookie('user_id', user_id);
+    //res.cookie('user_id', user_id);
     res.redirect("/urls");
   }
 });
