@@ -32,9 +32,9 @@
       <tbody>
         <% for(let url in urls) { %>
         <tr>
-          <td><%= url %></td>
-          <td><%= urls[url].longURL %></td>
-          <td>
+          <td><a href="<%= urls[url].longURL %>"><%= url %></a></td>
+          <td><a href="<%= urls[url].longURL %>"><%= urls[url].longURL %>  </a></td>
+
             <a class="btn btn-outline-warning" href="/urls/<%= url %>">edit</a>
             <!-- </form> -->
           </td>
