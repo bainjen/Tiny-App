@@ -54,9 +54,13 @@ const getUserByEmail = (email) => {
 //+++++DATA OBJECTS +++++++++
 
 const urlDatabase = {
-  // shortURL: longURL, 
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  // // shortURL: longURL, 
+  // "b2xVn2": "http://www.lighthouselabs.ca",
+  // "9sm5xK": "http://www.google.com
+  //restructured database to include a userid
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+
 };
 
 const users = {
@@ -109,15 +113,15 @@ app.get('/urls', (req, res) => {
 //create a new shortened url 
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
+  const user = getUserById(user_id);
   // let templateVars =
   // {
   //   urls: urlDatabase,
   //   // username: user_id
   //   user_id: users.email
   // };
-  
-  const user = getUserById(user_id); 
-  if (getUserById(user_id) === null) {
+   
+  if (user === null) {
     return res.redirect('/login');
   }
 
@@ -133,7 +137,13 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   // console.log(req.body);  //shows value to set to longURL string
   let tempShortUrl = getRandomString(6);
-  urlDatabase[tempShortUrl] = req.body.longURL;
+  const user_id = req.cookies.user_id;
+  
+  urlDatabase[tempShortUrl] = {
+    longURL: req.body.longURL,
+    user_id: user_id
+  }
+  console.log(urlDatabase[tempShortUrl])
   res.redirect(`/urls/${tempShortUrl}`);
 });
 
@@ -146,15 +156,27 @@ app.get('/u/:shortURL', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
   const user = req.cookies.user_id;
-  let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
-    urls: urlDatabase,
-    user: user
-    // user_id: users.email,
-    // username: user_id
-  };
-  res.render("urls_show", templateVars);
+  const shortURL = req.params.shortURL;
+  // let templateVars = {
+  //   urls: urlDatabase,
+  //   user: user
+  // };
+  //   let templateVars = {
+  if (shortURL) {
+    let templateVars = {
+      urls: urlDatabase,
+      user: user,
+      }
+      res.render("urls_show", templateVars);
+    res.send('Error, URL does not exist');
+  }
+  
+  //   longURL: urlDatabase[req.params.shortURL],
+  //   urls: urlDatabase,
+  //   user: user
+  //   // user_id: users.email,
+  //   // username: user_id
+  // };
   // console.log("request object", req);
   // console.log("response object", res);
   // console.log(req.params);
