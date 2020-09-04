@@ -51,19 +51,24 @@ const getUserByEmail = (email) => {
   return null; 
 }
 
+
 //+++++DATA OBJECTS +++++++++
 
 const urlDatabase = {
-  // // shortURL: longURL, 
-  // "b2xVn2": "http://www.lighthouselabs.ca",
-  // "9sm5xK": "http://www.google.com
-  //restructured database to include a userid
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  a: { longURL: "https://www.google.ca", userID: "a" },
+  b: { longURL: "https://www.banff.ca", userID: "a" },
+  c: { longURL: "https://www.amazon.ca", userID: "userRandomID" }
 
 };
 
 const users = {
+  "a": {
+    id: "a",
+    email: "a@amail.com",
+    password: '11'
+  },
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
@@ -75,6 +80,19 @@ const users = {
     password: "dishwasher-funk"
   }
 };
+
+const urlsForUser = (id) => {
+  let userURLdata = {};
+  for (const url in urlDatabase) {
+    if (id === urlDatabase[url].userID) {
+      userURLdata[url] = urlDatabase[url];
+   }
+  }
+  console.log(userURLdata);
+  return userURLdata; 
+}
+
+urlsForUser('a'); 
 
 
 //++++ROUTES++++++
@@ -95,16 +113,14 @@ app.get('/urls', (req, res) => {
   if (!user_id) {
     return res.redirect('/login');
   }
-  // console.log('line 72 ', user_id);
-  // console.log(users);
-  // console.log(users[user_id].email);
+  
   const user = getUserById(user_id); 
   if (!user) {
     return res.redirect('/login');
   }
-
+  
   let templateVars = {
-    urls: urlDatabase,
+    urls: urlsForUser(user_id),
     user: user
   };
   res.render('urls_index', templateVars);
@@ -114,6 +130,8 @@ app.get('/urls', (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
   const user = getUserById(user_id);
+  console.log('user', user);
+  console.log('user_id', user_id);
   // let templateVars =
   // {
   //   urls: urlDatabase,
@@ -129,9 +147,14 @@ app.get("/urls/new", (req, res) => {
     urls: urlDatabase,
     user: user
   };
-
+  
   res.render("urls_new", templateVars);
 });
+
+app.post("/urls/new", (req, res) => {
+  res.redirect("/urls");
+});
+
 
 //handles user input form submission
 app.post("/urls", (req, res) => {
@@ -143,33 +166,37 @@ app.post("/urls", (req, res) => {
     longURL: req.body.longURL,
     user_id: user_id
   }
-  console.log(urlDatabase[tempShortUrl])
+  console.log("is it me?", urlDatabase[tempShortUrl])
   res.redirect(`/urls/${tempShortUrl}`);
 });
 
 //link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  // if (req.params.shortURL) {
+  const shortURL = req.params.shortURL; 
+  const longURL = urlDatabase[shortURL].longURL;
+  res.redirect(longURL)
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   //shortURL --> I am assigning a value from req.params, which I have called shortURL; longURL -->I am accessing a value; 
-  const user = req.cookies.user_id;
+  const user = users[req.cookies.user_id];
   const shortURL = req.params.shortURL;
-  // let templateVars = {
-  //   urls: urlDatabase,
-  //   user: user
-  // };
-  //   let templateVars = {
+  const longURL = urlDatabase[shortURL].longURL;
+  if (!user) {
+    return res.redirect('/login');
+  };
+
   if (shortURL) {
-    let templateVars = {
-      urls: urlDatabase,
-      user: user,
-      }
-      res.render("urls_show", templateVars);
-    res.send('Error, URL does not exist');
+    const templateVars = {
+      user,
+      shortURL,
+      longURL
+    };
+
+    return  res.render("urls_show", templateVars);
   }
+  return res.send('Error, URL does not exist');
   
   //   longURL: urlDatabase[req.params.shortURL],
   //   urls: urlDatabase,
@@ -191,7 +218,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   res.redirect("/urls")
 });
 
