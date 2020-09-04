@@ -1,4 +1,4 @@
-//+++++++SETUP REQUIRE++++++++++++
+//+++++++DEPENDENCIES/IMPORTS/SETUP++++++++++++
 
 const express = require('express');
 const app = express();
@@ -21,33 +21,9 @@ app.set('view engine', 'ejs');
 
 //+++++DATA OBJECTS +++++++++
 
-const urlDatabase = {
-  b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'aJ48lW' },
-  i3BoGr: { longURL: 'https://www.google.ca', userID: 'aJ48lW' },
-  a: { longURL: 'https://www.google.ca', userID: 'a' },
-  b: { longURL: 'https://www.banff.ca', userID: 'a' },
-  c: { longURL: 'https://www.amazon.ca', userID: 'a' },
-};
-
-
-const users = {
-  a: {
-    id: 'a',
-    email: 'a@amail.com',
-    password: '$2b$10$8k5NzueKCVAelU5dCC/syeLeXLOywhiQjVW8DHuQJGRJz6LWQZ55S',
-  },
-  userRandomID: {
-    id: 'userRandomID',
-    email: 'user@example.com',
-    password: 'purple-monkey-dinosaur',
-  },
-  user2RandomID: {
-    id: 'user2RandomID',
-    email: 'user2@example.com',
-    // password: "dishwasher-funk"
-    password: '$2b$10$8k5NzueKCVAelU5dCC/syeLeXLOywhiQjVW8DHuQJGRJz6LWQZ55S',
-  },
-};
+//removed test data
+const urlDatabase = {};
+const users = {};
 
 
 //++++ROUTES++++++
@@ -58,16 +34,13 @@ app.listen(PORT, () => {
 
 //homepage
 app.get('/', (req, res) => {
-  //nothing here yet
-  res.redirect('/urls'); //andre
+  return res.redirect('/login');
 });
 
-//list of logged in user's urls
+//index of logged in user's urls
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
-  // console.log(urlDatabase);
-  // console.log('urlsForUserDB: inside urls', urlsForUserDB);
   //need to add error message - checking to see whether user has been assigned a cookie
   if (!user_id) {
     return res.redirect('/login');
@@ -114,7 +87,7 @@ app.post('/urls', (req, res) => {
   res.redirect('/urls');
 });
 
-//link that redirects to long url page
+//contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
@@ -141,7 +114,7 @@ app.get('/urls/:shortURL', (req, res) => {
   return res.send('Error, URL does not exist');
 });
 
-//delete a link off url list
+//deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = req.session.user_id;
   if (!user) {
@@ -186,12 +159,13 @@ app.post('/login', (req, res) => {
   }
 });
 
+//handles user logout
 app.post('/logout', (req, res) => {
   req.session = null;
   res.redirect('/urls');
 });
 
-//goes to page to register as a user
+//goes to page to register as a new user
 app.get('/register', (req, res) => {
   let templateVars = {
     user: req.session.user_id,
@@ -199,7 +173,7 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
-//validates registration, sends user to urls
+//validates registration, sends user to list of urls
 app.post('/register', (req, res) => {
   const user_id = getRandomString(5);
   const userEmail = req.body.email;
@@ -209,7 +183,7 @@ app.post('/register', (req, res) => {
     res.status(400).send('Sorry, your email or password is invalid.');
   } else {
     req.session.user_id = user_id;
-    const hashedPassword = bcrypt.hashSync(userPW, 10); //andre
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
     users[user_id] = {
       id: user_id,
       email: userEmail,
@@ -220,3 +194,4 @@ app.post('/register', (req, res) => {
   }
 });
 
+//credit is due to Andre, Thai, and Jae in my cohort, and many, many mentors whom cumulatively have spent hours helping me structure, debug, and understand my code. This would not have been possible in this week-long timeframe without their guidance.
