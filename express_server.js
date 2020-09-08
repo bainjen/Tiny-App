@@ -22,15 +22,39 @@ app.set('view engine', 'ejs');
 //+++++DATA OBJECTS +++++++++
 
 //removed test data
-const urlDatabase = {};
-const users = {};
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  i245bv: { longURL: "https://www.youtube.ca", userID: "bb1234" },
+  i245G3: { longURL: "https://www.yahoo.ca", userID: "bb1234" }
+};
+// const urlDatabase = {
+//   b6UTxQ: { longURL: 'https://www.tsn.ca', userID: 'user@example.com', visit: 3 },
+//   i3BoGr: { longURL: 'https://www.google.ca', userID: 'user@example.com', visit: 2 },
+//   pqWc5L: { longURL: 'https://www.bloomberg.com/canada', userID: 'user2@example.com', visit: 5 },
+//   SHbJto: { longURL: 'https://ca.finance.yahoo.com/', userID: 'user2@example.com', visit: 1 },
+//   i3BsGr: { longURL: 'https://www.bloomberg.ca', userID: 'user@example.com', visit: 0 },
+// };
 
+// if (urlDatabase[shortURL].user !== user) {
+
+//samplebase.js
+const users = {
+  aJ48lW: {
+    id: 'aJ48lW',
+    email: 'user@example.com',
+    // password: 'purple-monkey-dinosaur',
+    password: '$2a$10$mRA0PJmaZUXtGuDmGeISg.f0LqvbbfAm1zRNRwFSFCk85FaULZhX6', // for helpersTest.js
+  },
+  bb1234: {
+    id: 'bb1234',
+    email: 'user2@example.com',
+    // password: 'dishwasher-funk',
+    password: '$2a$10$drF4E9kLAsNW18wTmuGBtuTxmhb2ydfFuxyKMxJ7Qf1bo/psRMVPG', // for helpersTest.js
+  },
+};
 
 //++++ROUTES++++++
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
 
 //homepage
 app.get('/', (req, res) => {
@@ -45,9 +69,9 @@ app.get('/urls', (req, res) => {
   if (!user_id) {
     return res.redirect('/login');
   }
-
+  // users
   const user = getUserById(user_id, users); //return an object
-
+  console.log(urlDatabase);
   if (!user) {
     return res.redirect('/login');
   } else {
@@ -91,28 +115,33 @@ app.post('/urls', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
+  const user = req.session.user_id;
+  //SEPT 7: sends an error if the short url does not exist at all -- still need to check if other permissions okay
+  if (!shortURL || !user) {
+    return res.status(400).send('This URL does not exist yet');
+  }
   res.redirect(longURL);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = users[req.session.user_id];
+  // const user = users[req.session.user_id];
+  const user = req.session.user_id;
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
-  if (!user) {
-    return res.redirect('/login');
-  }
-
-  if (shortURL) {
+  // if (user) {
+  if(urlDatabase[shortURL].userID === user) {
     const templateVars = {
       user,
       shortURL,
       longURL,
     };
-
+    
     return res.render('urls_show', templateVars);
   }
-  return res.send('Error, URL does not exist');
+  // return res.send('Requested page was not found');
+  res.redirect('/login');
 });
+
 
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -194,4 +223,43 @@ app.post('/register', (req, res) => {
   }
 });
 
-//credit is due to Andre, Thai, and Jae in my cohort, and many, many mentors whom cumulatively have spent hours helping me structure, debug, and understand my code. This would not have been possible in this week-long timeframe without their guidance.
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
+});
+
+
+
+
+// //contains link that redirects to long url page
+// app.get('/u/:shortURL', (req, res) => {
+//   const shortURL = req.params.shortURL;
+//   const longURL = urlDatabase[shortURL].longURL;
+//   //ADDED
+//   if (!urlDatabase.shortURL) {
+//     return res.status(400).send('This URL does not exist yet'); 
+//   }
+//   if (!urlDatabase.shortURL) {
+//     return res.status(400).send('This URL does not exist yet'); 
+//   }
+//   res.redirect(longURL);
+// });
+
+
+            // if (!user) {
+            //   return res.redirect('/login');
+            // }
+            // //SEPT 7 ADD NEW CHECKS HERE 
+            // //this is saying my own links don't belong to me
+            // // if (urlDatabase[shortURL].user !== user) {
+            // //   return res.status(403).send('This URL does not belong to you!');
+            // // }
+          
+            // //need to check if short url does not belong to me
+          
+            // //SEPT 7 ADD NEW CHECKS HERE 
+            // if (!urlDatabase[shortURL]) {
+            //   return res.status(400).send('This URL does not exist yet');
+            // }
+          
+            /////////
