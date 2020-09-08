@@ -63,7 +63,7 @@ app.get('/', (req, res) => {
 
 //index of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = req.session.user_id;
+  const user_id = users[req.session.user_id];
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
   //need to add error message - checking to see whether user has been assigned a cookie
   if (!user_id) {
@@ -74,13 +74,13 @@ app.get('/urls', (req, res) => {
   console.log(urlDatabase);
   if (!user) {
     return res.redirect('/login');
-  } else {
-    const templateVars = {
+  } 
+  const templateVars = {
       urls: urlsForUserDB,
       user: user,
     };
-    res.render('urls_index', templateVars);
-  }
+   return res.render('urls_index', templateVars);
+  
 });
 
 //create a new shortened url
@@ -114,13 +114,20 @@ app.post('/urls', (req, res) => {
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
+  const longURL = urlDatabase[req.params.shortURL].longURL;
+  // console.log(longURL); 
   const user = req.session.user_id;
-  //SEPT 7: sends an error if the short url does not exist at all -- still need to check if other permissions okay
-  if (!shortURL || !user) {
-    return res.status(400).send('This URL does not exist yet');
+  console.log('THIS IS LINE 120!!!', user); 
+  if (user) {
+    return res.redirect(longURL);
+  } else {
+    return res.redirect('/urls');
   }
-  res.redirect(longURL);
+
+ 
+    
+    // return res.status(400).send('This URL does not exist yet');
+  
 });
 
 app.get('/urls/:shortURL', (req, res) => {
