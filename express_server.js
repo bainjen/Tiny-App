@@ -55,38 +55,31 @@ app.get('/', (req, res) => {
 
 //index of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = users[req.session.user_id];
+  const user_id = req.session.user_id;
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
   const user = getUserById(user_id, users); //return an object
-
-  // if (!user_id || !user) {
-    if (!user_id) {
+  if (!user_id) {
     return res.redirect('/login');
   } else {
-
     const templateVars = {
       urls: urlsForUserDB,
       user: user,
     };
     return res.render('urls_index', templateVars);
   }
-
 });
 
 //create a new shortened url
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
   const user = getUserById(user_id, users);
-
   if (user === null) {
     return res.redirect('/login');
   }
-
-  const templateVars = {
+  let templateVars = {
     urls: urlDatabase,
     user: user,
   };
-
   res.render('urls_new', templateVars);
 });
 
@@ -105,13 +98,11 @@ app.post('/urls', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
   const user = req.session.user_id;
-
   if (user) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
   return res.redirect('/urls');
 });
-
 
 app.get('/urls/:shortURL', (req, res) => {
   const user = req.session.user_id;
