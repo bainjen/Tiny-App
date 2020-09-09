@@ -63,11 +63,11 @@ app.get('/', (req, res) => {
 
 //index of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = users[req.session.user_id];
+  const user_id = req.session.user_id;
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
   const user = getUserById(user_id, users); //return an object
   //need to add error message - checking to see whether user has been assigned a cookie
-  if (!user_id || !user) {
+  if (!user_id) {
     return res.redirect('/login');
   } else {
 
