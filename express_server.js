@@ -66,39 +66,28 @@ app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
   const user = getUserById(user_id, users); //return an object
-  //need to add error message - checking to see whether user has been assigned a cookie
   if (!user_id) {
     return res.redirect('/login');
   } else {
-
     const templateVars = {
         urls: urlsForUserDB,
         user: user,
       };
      return res.render('urls_index', templateVars);
   }
-  // users
-  // console.log(urlDatabase);
-  // if (!user) {
-  //   return res.redirect('/login');
-  // } 
-  
 });
 
 //create a new shortened url
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
   const user = getUserById(user_id, users);
-
   if (user === null) {
     return res.redirect('/login');
   }
-
   let templateVars = {
     urls: urlDatabase,
     user: user,
   };
-
   res.render('urls_new', templateVars);
 });
 
@@ -116,40 +105,12 @@ app.post('/urls', (req, res) => {
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  console.log('shortURL:', shortURL);
-  // const longURL = urlDatabase[req.params.shortURL].longURL;
-  // console.log(longURL);
   const user = req.session.user_id;
-  console.log('user:', user);
-  console.log('THIS IS LINE 120!!!', user);
   if (user) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
   return res.redirect('/urls');
-  // return res.status(400).send('This URL does not exist yet');
 });
-
-
-// app.get('/u/:shortURL', (req, res) => {
-//   const shortURL = req.params.shortURL;
-//   const longURL = urlDatabase[req.params.shortURL].longURL;
-//   // console.log(longURL); 
-//   const user = req.session.user_id;
-//   console.log('THIS IS LINE 120!!!', user); 
-//   // if (!longURL) {
-//   //   return res.status(400).send('This URL does not exist yet');
-//   // }
-//   if (user) {
-//     return res.redirect(longURL);
-//   } else {
-//     return res.redirect('/urls');
-//   }
-
- 
-    
-//     // return res.status(400).send('This URL does not exist yet');
-  
-// });
 
 app.get('/urls/:shortURL', (req, res) => {
   // const user = users[req.session.user_id];
