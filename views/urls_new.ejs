@@ -4,18 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-
   <title>New URL - TinyApp Example</title>
 </head>
 
 <body>
-
   <%- include('partials/_header', {user: user}) %>
-
   <main style="margin: 1em;">
     <h3>Create TinyURL</h3>
     <form class="form-inline" action="/urls" method="POST">
@@ -39,9 +35,3 @@
 </body>
 
 </html>
-
-
-
-<!-- The form tag has two important attributes: action and method. The action attribute tells the form which URL to submit to while the method attribute tells the form which HTTP method to use when submitting the form.
-
-The input tag has an important attribute as well: name. This attribute identifies the data we are sending; in this case, it adds the key longURL to the data we'll be sending in the body of our POST request. -->
