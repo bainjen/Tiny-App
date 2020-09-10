@@ -1,8 +1,8 @@
-//+++++++DEPENDENCIES/IMPORTS/SETUP++++++++++++
+//+++++++DEPENDENCIES/SETUP++++++++++++
 
 const express = require('express');
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
@@ -45,7 +45,6 @@ const users = {
 
 //homepage
 app.get('/', (req, res) => {
-  // return res.redirect('/login');
   if (req.session.user_id) {
     res.redirect('/urls');
   } else {
@@ -53,7 +52,7 @@ app.get('/', (req, res) => {
   }
 });
 
-//index of logged in user's urls
+//list of logged in user's urls
 app.get('/urls', (req, res) => {
   const user_id = req.session.user_id;
   const urlsForUserDB = urlsForUser(user_id, urlDatabase);
@@ -76,7 +75,7 @@ app.get('/urls/new', (req, res) => {
   if (user === null) {
     return res.redirect('/login');
   }
-  let templateVars = {
+  const templateVars = {
     urls: urlDatabase,
     user: user,
   };
@@ -108,7 +107,6 @@ app.get('/urls/:shortURL', (req, res) => {
   const user = req.session.user_id;
   const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL].longURL;
-
   if (urlDatabase[shortURL].userID === user) {
     const templateVars = {
       user,
@@ -119,7 +117,6 @@ app.get('/urls/:shortURL', (req, res) => {
   }
   res.redirect('/login');
 });
-
 
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
@@ -150,14 +147,14 @@ app.post('/login', (req, res) => {
   const userPW = req.body.password;
 
   if (!userEmail || !userPW) {
-    return res.send('must fill out valid email and password');
+    return res.status(400).send('⚠️must fill out valid email and password⚠️');
   }
   const user = getUserByEmail(userEmail, users);
   if (user === null) {
-    return res.send('No user found with that email.');
+    return res.status(400).send('⚠️No user found with that email⚠️');
   }
   if (!bcrypt.compareSync(userPW, user.password)) {
-    return res.send('Username or password incorrect: please try again');
+    return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
   } else {
 
     const user_id = users.user_id;
@@ -169,10 +166,10 @@ app.post('/login', (req, res) => {
 //handles user logout
 app.post('/logout', (req, res) => {
   req.session = null;
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
-//goes to page to register as a new user
+//allows new user to register
 app.get('/register', (req, res) => {
   const templateVars = {
     user: req.session.user_id,
@@ -200,7 +197,6 @@ app.post('/register', (req, res) => {
     res.redirect('/urls');
   }
 });
-
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
