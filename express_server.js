@@ -19,27 +19,8 @@ app.set('view engine', 'ejs');
 
 //+++++DATA OBJECTS +++++++++
 
-const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
-  i245bv: { longURL: "https://www.youtube.ca", userID: "bb1234" },
-  i245G3: { longURL: "https://www.yahoo.ca", userID: "bb1234" }
-};
-
-const users = {
-  aJ48lW: {
-    id: 'aJ48lW',
-    email: 'user@example.com',
-    // password: 'purple-monkey-dinosaur',
-    password: '$2a$10$mRA0PJmaZUXtGuDmGeISg.f0LqvbbfAm1zRNRwFSFCk85FaULZhX6', // for helpersTest.js
-  },
-  bb1234: {
-    id: 'bb1234',
-    email: 'user2@example.com',
-    // password: 'dishwasher-funk',
-    password: '$2a$10$drF4E9kLAsNW18wTmuGBtuTxmhb2ydfFuxyKMxJ7Qf1bo/psRMVPG', // for helpersTest.js
-  },
-};
+const urlDatabase = {};
+const users = {};
 
 //++++ROUTES++++++
 
@@ -201,7 +182,3 @@ app.post('/register', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-
-
-

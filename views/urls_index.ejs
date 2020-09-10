@@ -1,16 +1,11 @@
 <!-- use the urls_index.ejs template to display all the URLs and their shortened forms -->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
   <!-- Bootstrap CSS -->
-
-
-
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <title>TinyApp</title>
@@ -34,22 +29,17 @@
         <tr>
           <td><a href="<%= urls[url].longURL %>"><%= url %></a></td>
           <td><a href="<%= urls[url].longURL %>"><%= urls[url].longURL %> </a></td>
-
           <td><a class="btn btn-outline-warning" href="/urls/<%= url %>">edit</a></td>
           <td>
             <form method="POST" action="/urls/<%= url %>/delete">
               <button type="submit" class="btn btn-danger">delete</button>
             </form>
           </td>
-
         </tr>
         <% } %>
       </tbody>
     </table>
   </main>
-
-
-
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
