@@ -1,47 +1,28 @@
 <header>
-  <!-- top-left clickable TinyApp -->
-
+<!-- header to update depending on whether user is logged in -->
   <% if (!user) { %>
-
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     </div>
-
-    <a href="/login">Login Here!</a>
+    <a class="navbar-brand" href="/login">Login Here!</a>
     <br>
-    <a href="/register">Register Here!</a>
-
-    <!-- login form -->
-    <% } else { %>
-
-    <nav class="navbar navbar-expand-md navbar-dark bg-success">
-      <a class="navbar-brand" href="/urls">TinyApp</a>
-      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-          <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        </div>
+    <a class="navbar-brand" href="/register">Register Here!</a>
+  </nav>
+  <% } else { %>
+  <nav class="navbar navbar-expand-md navbar-dark bg-success">
+    <a class="navbar-brand" href="/urls">TinyApp</a>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link" href="/urls">My URLs</a>
+        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= user.email %></h5>
-
-      <form class="" action="/logout" method="POST">
-        <button type="submit" class="btn btn-info">logout</button>
-      </form>
-      <a href="/logout"></a>
-      <!-- <form action="/login" method="POST">
-      <input type='text' name='username' placeholder="username">
-      <button type="submit" class="btn btn-outline-dark my-2 my-sm-0">login</button>
-    </form> -->
-      <% } %>
-
-      <!-- right side hamburger toggle and links -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-        aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-    </nav>
+    </div>
+    <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= user.email %></h5>
+    <form class="" action="/logout" method="POST">
+      <button type="submit" class="btn btn-info">logout</button>
+    </form>
+    <a class="navbar-brand" href="/logout"></a>
+  </nav>
+  <% } %>
 </header>
-
-<!-- class="form-control mr-sm-2" -->
