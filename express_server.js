@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 //allows new user to register
 app.get('/register', (req, res) => {
   const templateVars = {
-    user: req.session.user_id,
+    userID: req.session.user_id,
   };
   res.render('urls_register', templateVars);
 });
@@ -88,7 +88,7 @@ app.post('/register', (req, res) => {
 //login page for registered user
 app.get('/login', (req, res) => {
   const templateVars = {
-    user: req.session.user_id
+    userID: req.session.user_id
   };
   res.render('urls_login', templateVars);
 });
@@ -101,8 +101,8 @@ app.post('/login', (req, res) => {
   if (!userEmail || !userPW) {
     return res.status(400).send('⚠️must fill out valid email and password⚠️');
   }
-  const user = getUserByEmail(userEmail, users);
-  if (user === null) {
+  // const userID = getUserByEmail(userEmail, users);
+  if (userID === null) {
     return res.status(400).send('⚠️No user found with that email⚠️');
   }
   if (!bcrypt.compareSync(userPW, user.password)) {
@@ -178,30 +178,30 @@ app.get('/urls/new', (req, res) => {
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  const user = req.session.user_id;
-  if (user) {
+  const userID = req.session.user_id;
+  if (userID) {
     return res.redirect(urlDatabase[req.params.shortURL].longURL);
   }
   return res.redirect('/urls');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = req.session.user_id;
-  console.log(user);
+  const userID = req.session.user_id;
+  // console.log(user);
   const shortURL = req.params.shortURL;
-  console.log(urlDatabase);
-  console.log(urlDatabase[shortURL].userID);
-  if (urlDatabase[shortURL].userID === user) {
-
+  // console.log(urlDatabase);
+  // console.log(urlDatabase[shortURL].userID);
+  if (urlDatabase[shortURL].userID === userID) {
     const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
-      user,
+      userID,
       shortURL,
       longURL,
     };
     return res.render('urls_show', templateVars);
   }
-  res.redirect('/login');
+  return res.status(403).send('⚠️this url does not belong to youy⚠️');
+  // res.redirect('/login');
 });
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -219,18 +219,10 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 
   const userID = req.session.user_id;
   const urlToDelete = req.params.shortURL;
-  // console.log(userID === urlDatabase[urlToDelete].userID);
   if (userID === urlDatabase[urlToDelete].userID) {
     delete urlDatabase[urlToDelete];
   }
-
   res.redirect('/urls');
-  // const user = req.session.user_id;
-  // if (!user) {
-  //   return res.redirect('/login');
-  // }
-  // delete urlDatabase[req.params.shortURL];
-  // res.redirect('/urls');
 });
 //4th reviewer comment - users can delete posts that aren't their own //ask mentor 
 
