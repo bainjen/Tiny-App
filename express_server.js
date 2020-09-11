@@ -108,7 +108,6 @@ app.post('/login', (req, res) => {
     return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
   } else {
 
-
     req.session.user_id = userID;
     res.redirect('/urls');
   }
@@ -142,13 +141,13 @@ app.get('/urls', (req, res) => {
 
 //handles user input form submission
 app.post('/urls', (req, res) => {
-  const tempShortUrl = getRandomString(6);
-  const user_id = req.session.user_id;
-  urlDatabase[tempShortUrl] = {
+  const shortURL = getRandomString(6);
+  const userID = req.session.user_id;
+  urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userID: user_id,
+    userID: userID,
   };
-  res.redirect('/urls');
+  res.redirect(`/urls/${shortURL}`);
 });
 
 //create a new shortened url
