@@ -55,27 +55,6 @@ app.get('/', (req, res) => {
   }
 });
 
-//validates registration, sends user to list of urls
-app.post('/register', (req, res) => {
-  const user_id = getRandomString(5);
-  const userEmail = req.body.email;
-  const userPW = req.body.password;
-  //if empty strings --> response = 404 statuscode
-  if (!userEmail || !userPW || emailExists(userEmail, users)) {
-    res.status(400).send('Sorry, your email or password is invalid.');
-  } else {
-    req.session.user_id = user_id;
-    const hashedPassword = bcrypt.hashSync(userPW, 10);
-    users[user_id] = {
-      id: user_id,
-      email: userEmail,
-      password: hashedPassword,
-
-    };
-    res.redirect('/urls');
-  }
-});
-
 //allows new user to register
 app.get('/register', (req, res) => {
   const templateVars = {
@@ -84,10 +63,32 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
+
+//validates registration, sends user to list of urls
+app.post('/register', (req, res) => {
+  const userID = getRandomString(6);
+  const userEmail = req.body.email;
+  const userPW = req.body.password;
+  //if empty strings --> response = 404 statuscode
+  if (!userEmail || !userPW || emailExists(userEmail, users)) {
+    res.status(400).send('Sorry, your email or password is invalid.');
+  } else {
+    req.session.user_id = userID;
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
+    users[userID] = {
+      id: userID,
+      email: userEmail,
+      password: hashedPassword,
+
+    };
+    res.redirect('/urls');
+  }
+});
+
 //login page for registered user
 app.get('/login', (req, res) => {
   const templateVars = {
-    user: null,
+    user: req.session.user_id
   };
   res.render('urls_login', templateVars);
 });
@@ -108,7 +109,9 @@ app.post('/login', (req, res) => {
     return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
   } else {
 
-    req.session.user_id = userID;
+    req.session.user_id = userID.id;
+    console.log("req.sessions",req.session.user_id)
+    // res.send('hello'); 
     res.redirect('/urls');
   }
   //9/11 1:51 changed above code and added userID const to top -- not sure yet whether this has actually worked. 
@@ -128,7 +131,7 @@ app.get('/urls', (req, res) => {
   const userID = req.session.user_id;
   const urlsForUserDB = urlsForUser(userID, urlDatabase);
   const user = getUserById(userID, users); //return an object
-  if (!userID) {
+  if (!user) {
     return res.redirect('/login');
   } else {
     const templateVars = {
@@ -143,7 +146,7 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = getRandomString(6);
   const userID = req.session.user_id;
-  if (userID) {
+  if (getUserById(userID, users)) {
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
       userID: userID
@@ -159,8 +162,8 @@ app.post('/urls', (req, res) => {
 //   }
 
 app.get('/urls/new', (req, res) => {
-  const user_id = req.session.user_id;
-  const user = getUserById(user_id, users);
+  const userID = req.session.user_id;
+  const user = getUserById(userID, users);
   if (user === null) {
     return res.redirect('/login');
   }
@@ -184,9 +187,13 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   const user = req.session.user_id;
+  console.log(user);
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
+  console.log(urlDatabase);
+  console.log(urlDatabase[shortURL].userID);
   if (urlDatabase[shortURL].userID === user) {
+
+    const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
       user,
       shortURL,
@@ -211,13 +218,13 @@ app.post('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
 
   const userID = req.session.user_id;
-  const urlToDelete = req.params.shortURL; 
-  console.log(userID === urlDatabase[urlToDelete].userID); 
-	if (userID === urlDatabase[userID].userID) {
-		delete urlDatabase[urlToDelete];
+  const urlToDelete = req.params.shortURL;
+  // console.log(userID === urlDatabase[urlToDelete].userID);
+  if (userID === urlDatabase[urlToDelete].userID) {
+    delete urlDatabase[urlToDelete];
   }
-  
-	res.redirect('/urls');
+
+  res.redirect('/urls');
   // const user = req.session.user_id;
   // if (!user) {
   //   return res.redirect('/login');
