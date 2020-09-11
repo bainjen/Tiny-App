@@ -143,14 +143,21 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = getRandomString(6);
   const userID = req.session.user_id;
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userID: userID,
-  };
-  res.redirect(`/urls/${shortURL}`);
+  if (userID) {
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userID: userID
+    };
+    // res.redirect('/urls');
+    res.redirect(`/urls/${shortURL}`);
+  }
+  res.redirect('/urls');
 });
+//second comment from reviewer
+//   if (!userID) {
+//     return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
+//   }
 
-//create a new shortened url
 app.get('/urls/new', (req, res) => {
   const user_id = req.session.user_id;
   const user = getUserById(user_id, users);
@@ -191,8 +198,13 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  const userID = req.session.user_id
+  if (userID) {
+    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  }
   res.redirect('/urls');
+  // urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  // res.redirect('/urls');
 });
 
 //deletes a link off url list
