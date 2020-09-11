@@ -19,8 +19,30 @@ app.set('view engine', 'ejs');
 
 //+++++DATA OBJECTS +++++++++
 
-const urlDatabase = {};
-const users = {};
+// const urlDatabase = {};
+// const users = {};
+
+const urlDatabase = {
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  i245bv: { longURL: "https://www.youtube.ca", userID: "bb1234" },
+  i245G3: { longURL: "https://www.yahoo.ca", userID: "bb1234" }
+};
+
+const users = {
+  aJ48lW: {
+    id: 'aJ48lW',
+    email: 'user@example.com',
+    // password: 'purple-monkey-dinosaur',
+    password: '$2a$10$mRA0PJmaZUXtGuDmGeISg.f0LqvbbfAm1zRNRwFSFCk85FaULZhX6', // for helpersTest.js
+  },
+  bb1234: {
+    id: 'bb1234',
+    email: 'user2@example.com',
+    // password: 'dishwasher-funk',
+    password: '$2a$10$drF4E9kLAsNW18wTmuGBtuTxmhb2ydfFuxyKMxJ7Qf1bo/psRMVPG', // for helpersTest.js
+  },
+};
 
 //++++ROUTES++++++
 
@@ -33,12 +55,81 @@ app.get('/', (req, res) => {
   }
 });
 
+//validates registration, sends user to list of urls
+app.post('/register', (req, res) => {
+  const user_id = getRandomString(5);
+  const userEmail = req.body.email;
+  const userPW = req.body.password;
+  //if empty strings --> response = 404 statuscode
+  if (!userEmail || !userPW || emailExists(userEmail, users)) {
+    res.status(400).send('Sorry, your email or password is invalid.');
+  } else {
+    req.session.user_id = user_id;
+    const hashedPassword = bcrypt.hashSync(userPW, 10);
+    users[user_id] = {
+      id: user_id,
+      email: userEmail,
+      password: hashedPassword,
+
+    };
+    res.redirect('/urls');
+  }
+});
+
+//allows new user to register
+app.get('/register', (req, res) => {
+  const templateVars = {
+    user: req.session.user_id,
+  };
+  res.render('urls_register', templateVars);
+});
+
+//login page for registered user
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: null,
+  };
+  res.render('urls_login', templateVars);
+});
+
+//redirect to user's existing list of urls
+app.post('/login', (req, res) => {
+  const userEmail = req.body.email;
+  const userPW = req.body.password;
+  const userID = getUserByEmail(userEmail, users);
+  if (!userEmail || !userPW) {
+    return res.status(400).send('⚠️must fill out valid email and password⚠️');
+  }
+  const user = getUserByEmail(userEmail, users);
+  if (user === null) {
+    return res.status(400).send('⚠️No user found with that email⚠️');
+  }
+  if (!bcrypt.compareSync(userPW, user.password)) {
+    return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
+  } else {
+
+
+    req.session.user_id = userID;
+    res.redirect('/urls');
+  }
+  //9/11 1:51 changed above code and added userID const to top -- not sure yet whether this has actually worked. 
+  // const user_id = users.user_id;
+  // req.session.user_id = user.id;
+  // res.redirect('/urls');
+});
+
+//handles user logout
+app.post('/logout', (req, res) => {
+  req.session = null;
+  res.redirect('/login');
+});
+
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user_id = req.session.user_id;
-  const urlsForUserDB = urlsForUser(user_id, urlDatabase);
-  const user = getUserById(user_id, users); //return an object
-  if (!user_id) {
+  const userID = req.session.user_id;
+  const urlsForUserDB = urlsForUser(userID, urlDatabase);
+  const user = getUserById(userID, users); //return an object
+  if (!userID) {
     return res.redirect('/login');
   } else {
     const templateVars = {
@@ -47,6 +138,17 @@ app.get('/urls', (req, res) => {
     };
     return res.render('urls_index', templateVars);
   }
+});
+
+//handles user input form submission
+app.post('/urls', (req, res) => {
+  const tempShortUrl = getRandomString(6);
+  const user_id = req.session.user_id;
+  urlDatabase[tempShortUrl] = {
+    longURL: req.body.longURL,
+    userID: user_id,
+  };
+  res.redirect('/urls');
 });
 
 //create a new shortened url
@@ -63,16 +165,6 @@ app.get('/urls/new', (req, res) => {
   res.render('urls_new', templateVars);
 });
 
-//handles user input form submission
-app.post('/urls', (req, res) => {
-  const tempShortUrl = getRandomString(6);
-  const user_id = req.session.user_id;
-  urlDatabase[tempShortUrl] = {
-    longURL: req.body.longURL,
-    userID: user_id,
-  };
-  res.redirect('/urls');
-});
 
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
@@ -99,6 +191,11 @@ app.get('/urls/:shortURL', (req, res) => {
   res.redirect('/login');
 });
 
+app.post('/urls/:shortURL', (req, res) => {
+  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  res.redirect('/urls');
+});
+
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
   const user = req.session.user_id;
@@ -107,76 +204,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
-});
-
-app.post('/urls/:shortURL', (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  res.redirect('/urls');
-});
-
-//login page for registered user
-app.get('/login', (req, res) => {
-  const templateVars = {
-    user: null,
-  };
-  res.render('urls_login', templateVars);
-});
-
-//redirect to user's existing list of urls
-app.post('/login', (req, res) => {
-  const userEmail = req.body.email;
-  const userPW = req.body.password;
-
-  if (!userEmail || !userPW) {
-    return res.status(400).send('⚠️must fill out valid email and password⚠️');
-  }
-  const user = getUserByEmail(userEmail, users);
-  if (user === null) {
-    return res.status(400).send('⚠️No user found with that email⚠️');
-  }
-  if (!bcrypt.compareSync(userPW, user.password)) {
-    return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
-  } else {
-
-    const user_id = users.user_id;
-    req.session.user_id = user.id;
-    res.redirect('/urls');
-  }
-});
-
-//handles user logout
-app.post('/logout', (req, res) => {
-  req.session = null;
-  res.redirect('/login');
-});
-
-//allows new user to register
-app.get('/register', (req, res) => {
-  const templateVars = {
-    user: req.session.user_id,
-  };
-  res.render('urls_register', templateVars);
-});
-
-//validates registration, sends user to list of urls
-app.post('/register', (req, res) => {
-  const user_id = getRandomString(5);
-  const userEmail = req.body.email;
-  const userPW = req.body.password;
-  //if empty strings --> response = 404 statuscode
-  if (!userEmail || !userPW || emailExists(userEmail, users)) {
-    res.status(400).send('Sorry, your email or password is invalid.');
-  } else {
-    req.session.user_id = user_id;
-    const hashedPassword = bcrypt.hashSync(userPW, 10);
-    users[user_id] = {
-      id: user_id,
-      email: userEmail,
-      password: hashedPassword,
-
-    };
-    res.redirect('/urls');
-  }
 });
 
 app.listen(PORT, () => {
