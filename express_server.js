@@ -209,13 +209,23 @@ app.post('/urls/:shortURL', (req, res) => {
 
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const user = req.session.user_id;
-  if (!user) {
-    return res.redirect('/login');
+
+  const userID = req.session.user_id;
+  const urlToDelete = req.params.shortURL; 
+  console.log(userID === urlDatabase[urlToDelete].userID); 
+	if (userID === urlDatabase[userID].userID) {
+		delete urlDatabase[urlToDelete];
   }
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  
+	res.redirect('/urls');
+  // const user = req.session.user_id;
+  // if (!user) {
+  //   return res.redirect('/login');
+  // }
+  // delete urlDatabase[req.params.shortURL];
+  // res.redirect('/urls');
 });
+//4th reviewer comment - users can delete posts that aren't their own //ask mentor 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
