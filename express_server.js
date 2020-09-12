@@ -105,7 +105,7 @@ app.post('/login', (req, res) => {
   if (userID === null) {
     return res.status(400).send('⚠️No user found with that email⚠️');
   }
-  if (!bcrypt.compareSync(userPW, user.password)) {
+  if (!bcrypt.compareSync(userPW, userID.password)) {
     return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
   } else {
 
@@ -128,15 +128,15 @@ app.post('/logout', (req, res) => {
 
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
-  const userID = req.session.user_id;
-  const urlsForUserDB = urlsForUser(userID, urlDatabase);
-  const user = getUserById(userID, users); //return an object
-  if (!user) {
+  const user = req.session.user_id;
+  const urlsForUserDB = urlsForUser(user, urlDatabase);
+  const userID = getUserById(user, users); //return an object
+  if (!userID) {
     return res.redirect('/login');
   } else {
     const templateVars = {
       urls: urlsForUserDB,
-      user: user,
+      userID: userID,
     };
     return res.render('urls_index', templateVars);
   }
@@ -162,14 +162,14 @@ app.post('/urls', (req, res) => {
 //   }
 
 app.get('/urls/new', (req, res) => {
-  const userID = req.session.user_id;
-  const user = getUserById(userID, users);
-  if (user === null) {
+  const user = req.session.user_id;
+  const userID = getUserById(user, users);
+  if (userID === null) {
     return res.redirect('/login');
   }
   const templateVars = {
     urls: urlDatabase,
-    user: user,
+    userID: userID,
   };
   res.render('urls_new', templateVars);
 });
@@ -185,13 +185,28 @@ app.get('/u/:shortURL', (req, res) => {
   return res.redirect('/urls');
 });
 
+// const user = req.session.user_id;
+// const urlsForUserDB = urlsForUser(user, urlDatabase);
+// const userID = getUserById(user, users); //return an object
+// if (!userID) {
+//   return res.redirect('/login');
+// } else {
+//   const templateVars = {
+//     urls: urlsForUserDB,
+//     userID: userID,
+//   };
+//   return res.render('urls_index', templateVars);
+// }
+
 app.get('/urls/:shortURL', (req, res) => {
-  const userID = req.session.user_id;
+  const user = req.session.user_id;
+  // const userID = getUserById(user, users)
   // console.log(user);
   const shortURL = req.params.shortURL;
   // console.log(urlDatabase);
-  // console.log(urlDatabase[shortURL].userID);
-  if (urlDatabase[shortURL].userID === userID) {
+  console.log(urlDatabase[shortURL].userID);
+  if (urlDatabase[shortURL].userID === user) {
+    const userID = getUserById(user, users)
     const longURL = urlDatabase[shortURL].longURL;
     const templateVars = {
       userID,
@@ -200,7 +215,7 @@ app.get('/urls/:shortURL', (req, res) => {
     };
     return res.render('urls_show', templateVars);
   }
-  return res.status(403).send('⚠️this url does not belong to youy⚠️');
+  // return res.status(403).send('⚠️this url does not belong to youy⚠️');
   // res.redirect('/login');
 });
 
