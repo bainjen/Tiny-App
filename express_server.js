@@ -110,7 +110,7 @@ app.post('/login', (req, res) => {
   } else {
 
     req.session.user_id = userID.id;
-    console.log("req.sessions",req.session.user_id)
+    console.log("req.sessions", req.session.user_id)
     // res.send('hello'); 
     res.redirect('/urls');
   }
@@ -152,9 +152,10 @@ app.post('/urls', (req, res) => {
       userID: userID
     };
     // res.redirect('/urls');
-    res.redirect(`/urls/${shortURL}`);
-  }
-  res.redirect('/urls');
+    return res.redirect(`/urls/${shortURL}`);
+  } 
+  return res.status(400).send('⚠️Please login or register⚠️');
+  // return res.redirect('/urls');
 });
 //second comment from reviewer
 //   if (!userID) {
@@ -204,18 +205,21 @@ app.get('/urls/:shortURL', (req, res) => {
   // console.log(user);
   const shortURL = req.params.shortURL;
   // console.log(urlDatabase);
-  console.log(urlDatabase[shortURL].userID);
-  if (urlDatabase[shortURL].userID === user) {
-    const userID = getUserById(user, users)
-    const longURL = urlDatabase[shortURL].longURL;
+  // console.log(urlDatabase[shortURL].userID);
+  const userID = getUserById(user, users)
+  const longURL = urlDatabase[shortURL].longURL;
+  
+  if (urlDatabase[shortURL].userID !== user) {
+    return res.status(403).send('⚠️this url does not belong to you⚠️');
+  }
+
+
     const templateVars = {
       userID,
       shortURL,
       longURL,
     };
     return res.render('urls_show', templateVars);
-  }
-  // return res.status(403).send('⚠️this url does not belong to youy⚠️');
   // res.redirect('/login');
 });
 
