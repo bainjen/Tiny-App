@@ -125,10 +125,10 @@ app.post('/logout', (req, res) => {
 
 //list of logged in user's urls
 app.get('/urls', (req, res) => {
-  const user = req.session.user_id;
-  const urlsForUserDB = urlsForUser(user, urlDatabase);
-  const userID = getUserById(user, users); //return an object
-  if (!userID) {
+  const userID = req.session.user_id;
+  const urlsForUserDB = urlsForUser(userID, urlDatabase);
+  const user = getUserById(userID, users); //return an object
+  if (!user) {
     return res.redirect('/login');
   } else {
     const templateVars = {
@@ -155,9 +155,9 @@ app.post('/urls', (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
-  const user = req.session.user_id;
-  const userID = getUserById(user, users);
-  if (userID === null) {
+  const userID = req.session.user_id;
+  const user = getUserById(userID, users);
+  if (user === null) {
     return res.redirect('/login');
   }
   const templateVars = {
@@ -175,19 +175,6 @@ app.get('/u/:shortURL', (req, res) => {
   }
   return res.status(400).send('⚠️ this tiny link does not exist ⚠️');
 });
-
-// const user = req.session.user_id;
-// const urlsForUserDB = urlsForUser(user, urlDatabase);
-// const userID = getUserById(user, users); //return an object
-// if (!userID) {
-//   return res.redirect('/login');
-// } else {
-//   const templateVars = {
-//     urls: urlsForUserDB,
-//     userID: userID,
-//   };
-//   return res.render('urls_index', templateVars);
-// }
 
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.session.user_id;
