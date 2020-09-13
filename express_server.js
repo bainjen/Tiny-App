@@ -63,15 +63,13 @@ app.get('/register', (req, res) => {
   res.render('urls_register', templateVars);
 });
 
-
 //validates registration, sends user to list of urls
 app.post('/register', (req, res) => {
   const userID = getRandomString(6);
   const userEmail = req.body.email;
   const userPW = req.body.password;
-  //if empty strings --> response = 404 statuscode
   if (!userEmail || !userPW || emailExists(userEmail, users)) {
-    res.status(400).send('Sorry, your email or password is invalid.');
+    res.status(400).send('⚠️ Sorry, your email or password is invalid ⚠️');
   } else {
     req.session.user_id = userID;
     const hashedPassword = bcrypt.hashSync(userPW, 10);
@@ -99,25 +97,19 @@ app.post('/login', (req, res) => {
   const userPW = req.body.password;
   const userID = getUserByEmail(userEmail, users);
   if (!userEmail || !userPW) {
-    return res.status(400).send('⚠️must fill out valid email and password⚠️');
+    return res.status(400).send('⚠️ must fill out valid email and password ⚠️');
   }
   const user = getUserByEmail(userEmail, users);
   if (user === null) {
-    return res.status(400).send('⚠️No user found with that email⚠️');
+    return res.status(400).send('⚠️ No user found with that email ⚠️');
   }
   if (!bcrypt.compareSync(userPW, user.password)) {
-    return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
+    return res.status(400).send('⚠️ Username or password incorrect: please try again ⚠️');
   } else {
 
     req.session.user_id = userID.id;
-    console.log("req.sessions", req.session.user_id)
-    // res.send('hello'); 
     res.redirect('/urls');
   }
-  //9/11 1:51 changed above code and added userID const to top -- not sure yet whether this has actually worked. 
-  // const user_id = users.user_id;
-  // req.session.user_id = user.id;
-  // res.redirect('/urls');
 });
 
 //handles user logout
@@ -136,7 +128,7 @@ app.get('/urls', (req, res) => {
   } else {
     const templateVars = {
       urls: urlsForUserDB,
-      user: user,
+      user: users[userID],
     };
     return res.render('urls_index', templateVars);
   }
@@ -157,7 +149,6 @@ app.post('/urls', (req, res) => {
   }
 });
 
-
 app.get('/urls/new', (req, res) => {
   const userID = req.session.user_id;
   const user = getUserById(userID, users);
@@ -166,11 +157,10 @@ app.get('/urls/new', (req, res) => {
   }
   const templateVars = {
     urls: urlDatabase,
-    user: user,
+    user: users[userID],
   };
   res.render('urls_new', templateVars);
 });
-
 
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
@@ -180,34 +170,23 @@ app.get('/u/:shortURL', (req, res) => {
 
 app.get('/urls/:shortURL', (req, res) => {
   const userID = req.session.user_id;
-  let templateVars = {
-    // user,
-    // shortURL,
-    // longURL,
-  };
+  let templateVars = {};
   if (!userID) {
-    templateVars.user = null; 
+    templateVars.user = null;
   } else {
-    const userURLs = urlsForUser(userID, urlDatabase); 
+    const userURLs = urlsForUser(userID, urlDatabase);
     const shortURL = req.params.shortURL;
     if (userURLs[shortURL]) {
       const longURL = urlDatabase[shortURL].longURL;
       templateVars.user = users[userID];
-      templateVars.longURL = longURL; 
-      templateVars.shortURL = shortURL; 
+      templateVars.longURL = longURL;
+      templateVars.shortURL = shortURL;
     } else {
-      templateVars.user = users[userID]; 
-      templateVars.shortURL = null; 
+      templateVars.user = users[userID];
+      templateVars.shortURL = null;
     }
   }
   res.render('urls_show', templateVars);
- 
-  // console.log('WE ARE HERE', shortURL);
-  // console.log(urlDatabase[shortURL]);
-  // console.log('HERE', urlDatabase[shortURL].userID);
-  // if (urlDatabase[shortURL].userID === user) {
-
-  // }
 });
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -240,7 +219,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
       return res.status(400).send('⚠️ inaccessible ⚠️');
     }
   }
-}); 
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
