@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <%- include('partials/_header', {userID: userID}) %>
+  <%- include('partials/_header', {user: user}) %>
   <main style="margin: 1em;">
     <h3>Login to TinyApp!</h3>
     <form class="form-inline" action="/login" method="POST">

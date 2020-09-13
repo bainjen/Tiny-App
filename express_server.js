@@ -59,11 +59,14 @@ app.get('/', (req, res) => {
 app.get('/register', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user: users[req.session.user_id],
+    };
+    res.render('urls_register', templateVars);
+
   }
-  const templateVars = {
-    user: users[req.session.user_id],
-  };
-  res.render('urls_register', templateVars);
+
 });
 
 //validates registration, sends user to list of urls
@@ -89,11 +92,14 @@ app.post('/register', (req, res) => {
 app.get('/login', (req, res) => {
   if (req.session.user_id) {
     res.redirect('/urls');
+  } else {
+    const templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render('urls_login', templateVars);
+
   }
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render('urls_login', templateVars);
+
 });
 
 //redirect to user's existing list of urls
