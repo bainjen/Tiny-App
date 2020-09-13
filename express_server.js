@@ -183,22 +183,35 @@ app.get('/u/:shortURL', (req, res) => {
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = req.session.user_id;
-  console.log(user);
-  const shortURL = req.params.shortURL;
-  console.log(urlDatabase);
-  console.log(urlDatabase[shortURL].userID);
-  if (urlDatabase[shortURL].userID === user) {
-
-    const longURL = urlDatabase[shortURL].longURL;
-    const templateVars = {
-      user,
-      shortURL,
-      longURL,
-    };
-    return res.render('urls_show', templateVars);
+  const userID = req.session.user_id;
+  let templateVars = {
+    // user,
+    // shortURL,
+    // longURL,
+  };
+  if (!userID) {
+    templateVars.user = null; 
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase); 
+    const shortURL = req.params.shortURL;
+    if (userURLs[shortURL]) {
+      const longURL = urlDatabase[shortURL].longURL;
+      templateVars.user = users[userID];
+      templateVars.longURL = longURL; 
+      templateVars.shortURL = shortURL; 
+    } else {
+      templateVars.user = users[userID]; 
+      templateVars.shortURL = null; 
+    }
   }
-  res.redirect('/login');
+  res.render('urls_show', templateVars);
+ 
+  // console.log('WE ARE HERE', shortURL);
+  // console.log(urlDatabase[shortURL]);
+  // console.log('HERE', urlDatabase[shortURL].userID);
+  // if (urlDatabase[shortURL].userID === user) {
+
+  // }
 });
 
 app.post('/urls/:shortURL', (req, res) => {
@@ -231,21 +244,7 @@ app.post('/urls/:shortURL/delete', (req, res) => {
       return res.status(400).send('⚠️ inaccessible ⚠️');
     }
   }
-});
-
-
-  //   const urlToDelete = req.params.shortURL;
-  // // console.log(userID === urlDatabase[urlToDelete].userID);
-  // if (userID === urlDatabase[urlToDelete].userID) {
-  //   delete urlDatabase[urlToDelete];
-
-  // const user = req.session.user_id;
-  // if (!user) {
-  //   return res.redirect('/login');
-  // }
-  // delete urlDatabase[req.params.shortURL];
-  // res.redirect('/urls');
-//4th reviewer comment - users can delete posts that aren't their own //ask mentor 
+}); 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
