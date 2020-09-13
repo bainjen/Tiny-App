@@ -146,24 +146,17 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = getRandomString(6);
   const userID = req.session.user_id;
-  console.log("we are here")
-  console.log(getUserById('fgdfg', users));
   if (getUserById(userID, users)) {
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
       userID: userID
     };
-    // res.redirect('/urls');
     res.redirect(`/urls/${shortURL}`);
   } else {
     return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
   }
-  // res.redirect('/urls');
 });
-//second comment from reviewer
-//   if (!userID) {
-//     return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
-//   }
+
 
 app.get('/urls/new', (req, res) => {
   const userID = req.session.user_id;
@@ -210,10 +203,17 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.post('/urls/:shortURL', (req, res) => {
   const userID = req.session.user_id
-  if (userID) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  if (!userID) {
+    return res.status(400).send('⚠️ inaccessible ⚠️');
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase);
+    if (userURLs[req.params.shortURL]) {
+      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+      res.redirect('/urls');  
+    } else {
+      return res.status(400).send('⚠️ inaccessible ⚠️');
+    }
   }
-  res.redirect('/urls');
   // urlDatabase[req.params.shortURL].longURL = req.body.longURL;
   // res.redirect('/urls');
 });
