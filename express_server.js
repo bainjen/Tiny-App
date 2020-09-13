@@ -175,11 +175,7 @@ app.get('/urls/new', (req, res) => {
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  const user = req.session.user_id;
-  if (user) {
-    return res.redirect(urlDatabase[req.params.shortURL].longURL);
-  }
-  return res.redirect('/urls');
+  return res.redirect(urlDatabase[shortURL].longURL);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
