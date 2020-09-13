@@ -57,21 +57,22 @@ app.get('/', (req, res) => {
 
 //allows new user to register
 app.get('/register', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
-    userID: req.session.user_id,
+    user: users[req.session.user_id],
   };
   res.render('urls_register', templateVars);
 });
-
 
 //validates registration, sends user to list of urls
 app.post('/register', (req, res) => {
   const userID = getRandomString(6);
   const userEmail = req.body.email;
   const userPW = req.body.password;
-  //if empty strings --> response = 404 statuscode
   if (!userEmail || !userPW || emailExists(userEmail, users)) {
-    res.status(400).send('Sorry, your email or password is invalid.');
+    res.status(400).send('⚠️ Sorry, your email or password is invalid ⚠️');
   } else {
     req.session.user_id = userID;
     const hashedPassword = bcrypt.hashSync(userPW, 10);
@@ -79,7 +80,6 @@ app.post('/register', (req, res) => {
       id: userID,
       email: userEmail,
       password: hashedPassword,
-
     };
     res.redirect('/urls');
   }
@@ -87,8 +87,11 @@ app.post('/register', (req, res) => {
 
 //login page for registered user
 app.get('/login', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
-    userID: req.session.user_id
+    user: users[req.session.user_id]
   };
   res.render('urls_login', templateVars);
 });
@@ -99,25 +102,19 @@ app.post('/login', (req, res) => {
   const userPW = req.body.password;
   const userID = getUserByEmail(userEmail, users);
   if (!userEmail || !userPW) {
-    return res.status(400).send('⚠️must fill out valid email and password⚠️');
+    return res.status(400).send('⚠️ must fill out valid email and password ⚠️');
   }
-  // const userID = getUserByEmail(userEmail, users);
-  if (userID === null) {
-    return res.status(400).send('⚠️No user found with that email⚠️');
+  const user = getUserByEmail(userEmail, users);
+  if (user === null) {
+    return res.status(400).send('⚠️ No user found with that email ⚠️');
   }
-  if (!bcrypt.compareSync(userPW, userID.password)) {
-    return res.status(400).send('⚠️Username or password incorrect: please try again⚠️');
+  if (!bcrypt.compareSync(userPW, user.password)) {
+    return res.status(400).send('⚠️ Username or password incorrect: please try again ⚠️');
   } else {
 
     req.session.user_id = userID.id;
-    console.log("req.sessions", req.session.user_id)
-    // res.send('hello'); 
     res.redirect('/urls');
   }
-  //9/11 1:51 changed above code and added userID const to top -- not sure yet whether this has actually worked. 
-  // const user_id = users.user_id;
-  // req.session.user_id = user.id;
-  // res.redirect('/urls');
 });
 
 //handles user logout
@@ -136,7 +133,7 @@ app.get('/urls', (req, res) => {
   } else {
     const templateVars = {
       urls: urlsForUserDB,
-      userID: userID,
+      user: users[userID],
     };
     return res.render('urls_index', templateVars);
   }
@@ -151,16 +148,11 @@ app.post('/urls', (req, res) => {
       longURL: req.body.longURL,
       userID: userID
     };
-    // res.redirect('/urls');
-    return res.redirect(`/urls/${shortURL}`);
-  } 
-  return res.status(400).send('⚠️Please login or register⚠️');
-  // return res.redirect('/urls');
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
+  }
 });
-//second comment from reviewer
-//   if (!userID) {
-//     return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
-//   }
 
 app.get('/urls/new', (req, res) => {
   const user = req.session.user_id;
@@ -170,20 +162,18 @@ app.get('/urls/new', (req, res) => {
   }
   const templateVars = {
     urls: urlDatabase,
-    userID: userID,
+    user: users[userID],
   };
   res.render('urls_new', templateVars);
 });
 
-
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  const userID = req.session.user_id;
-  if (userID) {
-    return res.redirect(urlDatabase[req.params.shortURL].longURL);
+  if (urlDatabase[shortURL]) {
+    return res.redirect(urlDatabase[shortURL].longURL);
   }
-  return res.redirect('/urls');
+  return res.status(400).send('⚠️ this tiny link does not exist ⚠️');
 });
 
 // const user = req.session.user_id;
@@ -200,50 +190,57 @@ app.get('/u/:shortURL', (req, res) => {
 // }
 
 app.get('/urls/:shortURL', (req, res) => {
-  const user = req.session.user_id;
-  // const userID = getUserById(user, users)
-  // console.log(user);
-  const shortURL = req.params.shortURL;
-  // console.log(urlDatabase);
-  // console.log(urlDatabase[shortURL].userID);
-  const userID = getUserById(user, users)
-  const longURL = urlDatabase[shortURL].longURL;
-  
-  if (urlDatabase[shortURL].userID !== user) {
-    return res.status(403).send('⚠️this url does not belong to you⚠️');
+  const userID = req.session.user_id;
+  let templateVars = {};
+  if (!userID) {
+    templateVars.user = null;
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase);
+    const shortURL = req.params.shortURL;
+    if (userURLs[shortURL]) {
+      const longURL = urlDatabase[shortURL].longURL;
+      templateVars.user = users[userID];
+      templateVars.longURL = longURL;
+      templateVars.shortURL = shortURL;
+    } else {
+      templateVars.user = users[userID];
+      templateVars.shortURL = null;
+    }
   }
-
-
-    const templateVars = {
-      userID,
-      shortURL,
-      longURL,
-    };
-    return res.render('urls_show', templateVars);
-  // res.redirect('/login');
+  res.render('urls_show', templateVars);
 });
 
 app.post('/urls/:shortURL', (req, res) => {
   const userID = req.session.user_id
-  if (userID) {
-    urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+  if (!userID) {
+    return res.status(400).send('⚠️ inaccessible ⚠️');
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase);
+    if (userURLs[req.params.shortURL]) {
+      urlDatabase[req.params.shortURL].longURL = req.body.longURL;
+      res.redirect('/urls');
+    } else {
+      return res.status(400).send('⚠️ inaccessible ⚠️');
+    }
   }
-  res.redirect('/urls');
-  // urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  // res.redirect('/urls');
 });
 
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
-
   const userID = req.session.user_id;
-  const urlToDelete = req.params.shortURL;
-  if (userID === urlDatabase[urlToDelete].userID) {
-    delete urlDatabase[urlToDelete];
+  if (!userID) {
+    return res.status(400).send('⚠️ inaccessible ⚠️');
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase);
+    const urlToDelete = req.params.shortURL;
+    if (userURLs[urlToDelete]) {
+      delete urlDatabase[urlToDelete];
+      res.redirect('/urls');
+    } else {
+      return res.status(400).send('⚠️ inaccessible ⚠️');
+    }
   }
-  res.redirect('/urls');
 });
-//4th reviewer comment - users can delete posts that aren't their own //ask mentor 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

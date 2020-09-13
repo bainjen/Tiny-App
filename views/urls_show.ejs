@@ -12,6 +12,15 @@
   <%- include('partials/_header', {userID: userID}) %>
   <div class="card text-center">
     <div class="card-header"></div>
+    <% if (!user) { %>
+    <div class="card-body">
+      <p>You're not logged in! Please login to access this page.</p>
+    </div>
+    <% } else if (!shortURL) { %>
+    <div class="card-body">
+      <p>This does not belong to you. Go away!</p>
+    </div>
+    <% } else { %>
     <div class="card-body">
       <h5 class="card-title">TinyURL for: <%= longURL %></h5>
       <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
@@ -25,6 +34,7 @@
         <button type="submit" class="btn btn-info">submit</button>
       </form>
     </div>
+    <% } %>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
