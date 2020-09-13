@@ -110,7 +110,7 @@ app.post('/login', (req, res) => {
   } else {
 
     req.session.user_id = userID.id;
-    console.log("req.sessions",req.session.user_id)
+    console.log("req.sessions", req.session.user_id)
     // res.send('hello'); 
     res.redirect('/urls');
   }
@@ -209,33 +209,42 @@ app.post('/urls/:shortURL', (req, res) => {
     const userURLs = urlsForUser(userID, urlDatabase);
     if (userURLs[req.params.shortURL]) {
       urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-      res.redirect('/urls');  
+      res.redirect('/urls');
     } else {
       return res.status(400).send('⚠️ inaccessible ⚠️');
     }
   }
-  // urlDatabase[req.params.shortURL].longURL = req.body.longURL;
-  // res.redirect('/urls');
 });
 
 //deletes a link off url list
 app.post('/urls/:shortURL/delete', (req, res) => {
-
   const userID = req.session.user_id;
-  const urlToDelete = req.params.shortURL;
-  // console.log(userID === urlDatabase[urlToDelete].userID);
-  if (userID === urlDatabase[urlToDelete].userID) {
-    delete urlDatabase[urlToDelete];
+  if (!userID) {
+    return res.status(400).send('⚠️ inaccessible ⚠️');
+  } else {
+    const userURLs = urlsForUser(userID, urlDatabase);
+    const urlToDelete = req.params.shortURL;
+    if (userURLs[urlToDelete]) {
+      delete urlDatabase[urlToDelete];
+      res.redirect('/urls');
+    } else {
+      return res.status(400).send('⚠️ inaccessible ⚠️');
+    }
   }
+});
 
-  res.redirect('/urls');
+
+  //   const urlToDelete = req.params.shortURL;
+  // // console.log(userID === urlDatabase[urlToDelete].userID);
+  // if (userID === urlDatabase[urlToDelete].userID) {
+  //   delete urlDatabase[urlToDelete];
+
   // const user = req.session.user_id;
   // if (!user) {
   //   return res.redirect('/login');
   // }
   // delete urlDatabase[req.params.shortURL];
   // res.redirect('/urls');
-});
 //4th reviewer comment - users can delete posts that aren't their own //ask mentor 
 
 app.listen(PORT, () => {
