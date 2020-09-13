@@ -57,8 +57,11 @@ app.get('/', (req, res) => {
 
 //allows new user to register
 app.get('/register', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
-    user: req.session.user_id,
+    user: users[req.session.user_id],
   };
   res.render('urls_register', templateVars);
 });
@@ -77,7 +80,6 @@ app.post('/register', (req, res) => {
       id: userID,
       email: userEmail,
       password: hashedPassword,
-
     };
     res.redirect('/urls');
   }
@@ -85,8 +87,11 @@ app.post('/register', (req, res) => {
 
 //login page for registered user
 app.get('/login', (req, res) => {
+  if (req.session.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
-    user: req.session.user_id
+    user: users[req.session.user_id]
   };
   res.render('urls_login', templateVars);
 });
@@ -165,7 +170,10 @@ app.get('/urls/new', (req, res) => {
 //contains link that redirects to long url page
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
-  return res.redirect(urlDatabase[shortURL].longURL);
+  if (urlDatabase[shortURL]) {
+    return res.redirect(urlDatabase[shortURL].longURL);
+  }
+  return res.status(400).send('⚠️ this tiny link does not exist ⚠️');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
