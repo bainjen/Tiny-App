@@ -146,6 +146,8 @@ app.get('/urls', (req, res) => {
 app.post('/urls', (req, res) => {
   const shortURL = getRandomString(6);
   const userID = req.session.user_id;
+  console.log("we are here")
+  console.log(getUserById('fgdfg', users));
   if (getUserById(userID, users)) {
     urlDatabase[shortURL] = {
       longURL: req.body.longURL,
@@ -153,8 +155,10 @@ app.post('/urls', (req, res) => {
     };
     // res.redirect('/urls');
     res.redirect(`/urls/${shortURL}`);
+  } else {
+    return res.status(400).send('⚠️users who are not logged in are unable to save urls⚠️');
   }
-  res.redirect('/urls');
+  // res.redirect('/urls');
 });
 //second comment from reviewer
 //   if (!userID) {
