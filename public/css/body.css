@@ -98,7 +98,7 @@ nav {
   color: white;
   font-weight: 600;
   font-family: "Varela Round", sans-serif;
-  margin-top: 1em;
+  /* margin-top: 1em; */
   margin-right: 1.5em;
 }
 
@@ -130,4 +130,10 @@ h3 {
   align-self: flex-start;
   height: 30px;
   font-size: 0.75em;
+  padding: 10px;
+  border-radius: 6px;
+  outline: none;
+}
+.form-group input:active {
+  outline: none;
 }
