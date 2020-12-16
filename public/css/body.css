@@ -38,7 +38,9 @@ nav {
   justify-content: space-between;
   align-items: flex-end;
   margin: 1em;
+  letter-spacing: 3px;
 }
+
 .navLeft a {
   margin: 0 0.5em;
   text-transform: uppercase;
@@ -65,7 +67,13 @@ nav {
 }
 
 .log-reg-right {
-  /* align-self: flex-end; */
+  display: flex;
+  justify-content: space-between;
+}
+
+.log-reg-right .navbar-brand {
+  margin-left: 1em;
+  font-size: 2em;
 }
 
 .logout-btn {
@@ -77,4 +85,49 @@ nav {
   font-size: 1em;
   margin: 1em;
   text-transform: uppercase;
+}
+
+.btn {
+  height: 2em;
+  width: 5em;
+  border-radius: 6px;
+  border: 0px;
+  font-size: 1em;
+  outline: none;
+  background-color: pink;
+  color: white;
+  font-weight: 600;
+  font-family: "Varela Round", sans-serif;
+  margin-top: 1em;
+  margin-right: 1.5em;
+}
+
+h3 {
+  font-size: 2.5em;
+}
+
+.main-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.5em;
+}
+
+.form-group label {
+  display: flex;
+  align-self: flex-start;
+  margin: 0.75em;
+}
+
+.form-group input {
+  display: flex;
+  align-self: flex-start;
+  height: 30px;
+  font-size: 0.75em;
 }
