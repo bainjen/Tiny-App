@@ -137,3 +137,14 @@ h3 {
 .form-group input:active {
   outline: none;
 }
+
+.enter {
+  text-transform: uppercase;
+  font-weight: 200;
+  margin: 0.8em;
+}
+
+.create-btn {
+  align-self: flex-start;
+  margin: 1em 0 0 0.9em;
+}
