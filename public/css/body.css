@@ -1,0 +1,80 @@
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  background-color: rgb(1, 33, 43);
+  color: whitesmoke;
+  font-family: sans-serif;
+  padding: 1em 2em;
+}
+a {
+  text-decoration: none;
+  color: pink;
+}
+
+a:visited {
+  text-decoration: none;
+  color: pink;
+}
+
+nav {
+  display: flex;
+  justify-content: space-between;
+  height: 20vh;
+  align-items: center;
+  font-size: 1em;
+  margin: 1em;
+}
+
+.navLeft {
+  /* color: red; */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 1em;
+}
+.navLeft a {
+  margin: 0 0.5em;
+  text-transform: uppercase;
+}
+
+.navbar-brand {
+  font-size: 2.5em;
+  margin-bottom: 0;
+}
+
+.not-brand {
+  display: flex;
+  align-items: flex-end;
+}
+
+.inAs {
+  font-size: 1em;
+  margin: 1em;
+  text-transform: uppercase;
+}
+
+.inAs p {
+  display: contents;
+}
+
+.log-reg-right {
+  /* align-self: flex-end; */
+}
+
+.logout-btn {
+  outline: none;
+  text-decoration: none;
+  border: none;
+  background-color: rgb(1, 33, 43);
+  color: whitesmoke;
+  font-size: 1em;
+  margin: 1em;
+  text-transform: uppercase;
+}

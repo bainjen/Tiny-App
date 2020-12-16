@@ -1,24 +1,28 @@
 <header>
   <!-- header to update depending on whether user is logged in -->
-  <nav class="navbar navbar-expand-md navbar-dark bg-success">
+  <nav>
     <a class="navbar-brand" href="/urls">TinyApp</a>
-    <% if (user) { %>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+    <div class="not-brand">
+      <% if (user) { %>
+      <div class="navLeft">
+        <a class="nav-item" href="/urls">My URLs</a>
+        <a class="nav-item" href="/urls/new">Create New URL</a>
       </div>
-    </div>
-    <h5 style="margin: 2px 4px 0 0; padding-right: 5px;">Logged In As: <%= user.email %></h5>
-    <form class="" action="/logout" method="POST">
-      <button type="submit" class="btn btn-info">logout</button>
-    </form>
-    <a class="navbar-brand" href="/logout"></a>
-    <% } else { %>
-    <a class="navbar-brand" href="/login">Login Here!</a>
-    <br>
-    <a class="navbar-brand" href="/register">Register Here!</a>
-    <% } %>
-  </nav>
+      <div class="inAs">
+        <p>Logged In As: <%= user.email %></p>
+      </div>
+      <form class="logout" action="/logout" method="POST">
+        <button type="submit" class="logout-btn">logout</button>
+      </form>
 
+      <a class="navbar-brand" href="/logout"></a>
+      <% } else { %>
+      <div class="log-reg-right">
+        <a class="navbar-brand" href="/login">Login</a>
+        <br />
+        <a class="navbar-brand" href="/register">Register</a>
+      </div>
+      <% } %>
+    </div>
+  </nav>
 </header>
