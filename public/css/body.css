@@ -148,3 +148,53 @@ h3 {
   align-self: flex-start;
   margin: 1em 0 0 0.9em;
 }
+
+table {
+  width: 90%;
+  margin: auto;
+  text-align: justify;
+}
+
+th {
+  font-size: 1.25em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 1em;
+}
+
+td {
+  font-size: 1.25em;
+  /* text-transform: uppercase; */
+  font-weight: 300;
+  padding: 1em;
+}
+
+.btn-danger {
+  background-color: rgb(244, 79, 150);
+}
+
+.card-body {
+  margin: 1em;
+}
+
+.card-footer {
+  margin: 1em;
+}
+
+h4 {
+  font-size: 1.25em;
+  font-weight: 300;
+}
+
+h4:hover {
+  /* background-color: aqua; */
+}
+
+.create-btn {
+  align-self: flex-start;
+  margin-left: 0;
+}
+
+a:hover {
+  color: rgb(244, 79, 150);
+}

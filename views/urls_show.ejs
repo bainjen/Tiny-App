@@ -19,22 +19,16 @@
       </div>
       <% } else { %>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a>
-        </p>
+        <h4 class="card-title">TinyURL for: <%= longURL %></h4>
+        <h4>Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></h4>
       </div>
-      <div class="card-footer text-muted">
+      <div class="card-footer">
         <label>
           <h3>edit</h3>
         </label>
-        <form
-          class="form-inline justify-content-center"
-          method="POST"
-          action="/urls/<%= shortURL %>"
-        >
+        <form class="form-group" method="POST" action="/urls/<%= shortURL %>">
           <input type="text" name="longURL" placeholder="http://" />
-          <button type="submit" class="btn btn-info">submit</button>
+          <button type="submit" class="btn create-btn">submit</button>
         </form>
       </div>
       <% } %>
